@@ -453,8 +453,9 @@ if(WIN32)
   message("IS_MSYS2: ${IS_MSYS2}")
 endif()
 
-if(WIN32 AND IS_MSYS2)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lmingw32")
+if(WIN32)
+  # this is required to get rid of the console window
+  target_link_options(xmoto PRIVATE "-mwindows")
 endif()
 
 target_include_directories(xmoto
@@ -660,11 +661,6 @@ if(WIN32)
     set(DLLCOPY_TARGET "${mxe_target}")
   endif()
   message("DLLCOPY_TARGET: ${DLLCOPY_TARGET}")
-
-  if(NOT IS_MSYS2)
-    # this is required to get rid of the console window
-    set(CMAKE_EXE_LINKER_FLAGS "-mwindows")
-  endif()
 
   if(IS_MSYS2)
     set_win32_compat_path(WIN32_COMPAT_SOURCE_DIR "${CMAKE_SOURCE_DIR}")
