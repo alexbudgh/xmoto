@@ -23,7 +23,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 #include "DBuffer.h"
 #include "helpers/SwapEndian.h"
+
 #include <algorithm>
+#include <cstdint>
 
 void DBuffer::_FreeDBuffer(void) {
   /* Free stuff if anything */
