@@ -216,7 +216,7 @@ bool StatePlayingLocal::update() {
 void StatePlayingLocal::xmKey(InputEventType i_type, const XMKey &i_xmkey) {
   if (i_type == INPUT_DOWN &&
       (i_xmkey == (*Input::instance()->getGlobalKey(INPUT_PLAYINGPAUSE)) ||
-       i_xmkey.getJoyButton() == SDL_CONTROLLER_BUTTON_START)) {
+       i_xmkey.getJoyButton() == SDL_GAMEPAD_BUTTON_START)) {
     if (isLockedScene() == false) {
       /* Escape pauses */
       m_displayStats = true;
@@ -225,7 +225,7 @@ void StatePlayingLocal::xmKey(InputEventType i_type, const XMKey &i_xmkey) {
     }
   }
 #if defined(ENABLE_DEV)
-  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_KP_0, KMOD_LCTRL)) {
+  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_KP_0, SDL_KMOD_LCTRL)) {
     if (m_universe != NULL) {
       for (unsigned int j = 0; j < m_universe->getScenes().size(); j++) {
         for (unsigned int i = 0;
@@ -245,7 +245,7 @@ void StatePlayingLocal::xmKey(InputEventType i_type, const XMKey &i_xmkey) {
     }
   }
 
-  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_KP_0, KMOD_NONE)) {
+  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_KP_0, SDL_KMOD_NONE)) {
     if (m_universe != NULL) {
       for (unsigned int j = 0; j < m_universe->getScenes().size(); j++) {
         Trainer::instance()->storePosition(
@@ -263,7 +263,7 @@ void StatePlayingLocal::xmKey(InputEventType i_type, const XMKey &i_xmkey) {
   }
 
   // TRAINER
-  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_BACKSPACE, KMOD_ALT)) {
+  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_BACKSPACE, SDL_KMOD_ALT)) {
     if (m_universe != NULL) {
       for (unsigned int j = 0; j < m_universe->getScenes().size(); j++) {
         if (Trainer::instance()->isRestorePositionAvailable(
@@ -285,7 +285,7 @@ void StatePlayingLocal::xmKey(InputEventType i_type, const XMKey &i_xmkey) {
     }
   }
 
-  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_MINUS, KMOD_NONE)) {
+  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_MINUS, SDL_KMOD_NONE)) {
     if (m_universe != NULL) {
       for (unsigned int j = 0; j < m_universe->getScenes().size(); j++) {
         if (Trainer::instance()->isRestorePositionAvailable(
@@ -307,7 +307,7 @@ void StatePlayingLocal::xmKey(InputEventType i_type, const XMKey &i_xmkey) {
     }
   }
 
-  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_PLUS, KMOD_NONE)) {
+  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_PLUS, SDL_KMOD_NONE)) {
     if (m_universe != NULL) {
       for (unsigned int j = 0; j < m_universe->getScenes().size(); j++) {
         if (Trainer::instance()->isRestorePositionAvailable(

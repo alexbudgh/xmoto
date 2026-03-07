@@ -41,9 +41,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "DrawLibOpenGL.h"
 #endif
 
-#ifdef ENABLE_SDLGFX
-#include "DrawLibSDLgfx.h"
-#endif
 
 bool DrawLib::m_initialized = false;
 
@@ -56,21 +53,10 @@ DrawLib *DrawLib::DrawLibFromName(std::string i_drawLibName) {
     return new DrawLibOpenGL();
   }
 #endif
-#ifdef ENABLE_SDLGFX
-  if (i_drawLibName == "SDLGFX") {
-    m_backend = backend_SdlGFX;
-    return new DrawLibSDLgfx();
-  }
-#endif
-
 /* if no name is given, try to force one renderer */
 #ifdef ENABLE_OPENGL
   m_backend = backend_OpenGl;
   return new DrawLibOpenGL();
-#endif
-#ifdef ENABLE_SDLGFX
-  m_backend = backend_SdlGFX;
-  return new DrawLibSDLgfx();
 #endif
 
   m_backend = backend_None;
@@ -587,7 +573,7 @@ FontManager::FontManager(DrawLib *i_drawLib,
   m_drawLib = i_drawLib;
   m_ttf = TTF_OpenFont(i_fontFile.c_str(), i_fontSize);
   if (m_ttf == NULL) {
-    throw Exception("FontManager: " + std::string(TTF_GetError()));
+    throw Exception("FontManager: " + std::string(SDL_GetError()));
   }
   TTF_SetFontStyle(m_ttf, TTF_STYLE_NORMAL);
   m_fixedFontSize = i_fixedFontSize;

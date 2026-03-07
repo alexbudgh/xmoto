@@ -24,8 +24,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include <string>
 
 struct SDL_Thread;
-struct SDL_mutex;
-struct SDL_cond;
+struct SDL_Mutex;
+struct SDL_Condition;
 
 class GameApp;
 class xmDatabase;
@@ -94,10 +94,10 @@ protected:
 
 private:
   int threadFunctionEncapsulate();
-  SDL_mutex *m_curOpMutex;
-  SDL_mutex *m_curMicOpMutex;
-  SDL_mutex *m_sleepMutex;
-  SDL_cond *m_sleepCond;
+  SDL_Mutex *m_curOpMutex;
+  SDL_Mutex *m_curMicOpMutex;
+  SDL_Mutex *m_sleepMutex;
+  SDL_Condition *m_sleepCond;
   bool m_safeKill;
   bool m_askSafeKill;
   std::string m_dbKey;

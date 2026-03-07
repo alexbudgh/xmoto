@@ -45,20 +45,15 @@ std::vector<std::string> *System::getDisplayModes(int windowed) {
                                { 1280, 1024 },
                                { 1600, 1200 } });
 
-  const int displayIndex = 0;
   int displayModeCount = 0;
-  if ((displayModeCount = SDL_GetNumDisplayModes(displayIndex)) < 1) {
+  SDL_DisplayID primaryDisplay = SDL_GetPrimaryDisplay();
+  const SDL_DisplayMode * const *modes = SDL_GetFullscreenDisplayModes(primaryDisplay, &displayModeCount);
+  if (!modes || displayModeCount < 1) {
     throw Exception("getDisplayModes: No display modes found.");
   }
-  // std::vector<SDL_DisplayMode> modes(displayModeCount);
 
   for (int modeIndex = 0; modeIndex < displayModeCount; ++modeIndex) {
-    SDL_DisplayMode mode;
-    if (SDL_GetDisplayMode(displayIndex, modeIndex, &mode) != 0) {
-      throw Exception("getDisplayModes: SDL_GetDisplayMode failed: " +
-                      std::string(SDL_GetError()));
-    }
-    dispModes.push_back({ mode.w, mode.h });
+    dispModes.push_back({ modes[modeIndex]->w, modes[modeIndex]->h });
   }
 
   /* Create a string-list of the display modes */
@@ -94,7 +89,7 @@ std::vector<std::string> *System::getDisplayModes(int windowed) {
 }
 
 std::string System::getClipboardText() {
-  if (SDL_HasClipboardText() != SDL_TRUE)
+  if (!SDL_HasClipboardText())
     return "";
 
   char *cstr = SDL_GetClipboardText();

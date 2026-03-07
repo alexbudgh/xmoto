@@ -137,7 +137,7 @@ private:
   // state type (server console, chat box, ...)
 
   std::queue<std::pair<std::string, std::string>> m_commands;
-  SDL_mutex *m_commandsMutex;
+  SDL_Mutex *m_commandsMutex;
 };
 
 #endif

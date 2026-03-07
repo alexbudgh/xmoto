@@ -228,8 +228,8 @@ void StateDeadMenu::executeOneCommand(std::string cmd, std::string args) {
 
 void StateDeadMenu::xmKey(InputEventType i_type, const XMKey &i_xmkey) {
   if (i_type == INPUT_DOWN &&
-      (i_xmkey == XMKey(SDLK_ESCAPE, KMOD_NONE) ||
-       i_xmkey.getJoyButton() == SDL_CONTROLLER_BUTTON_B)) {
+      (i_xmkey == XMKey(SDLK_ESCAPE, SDL_KMOD_NONE) ||
+       i_xmkey.getJoyButton() == SDL_GAMEPAD_BUTTON_EAST)) {
     /* quit this state */
     StateManager::instance()->sendAsynchronousMessage("ABORT", m_parentId);
     m_requestForEnd = true;

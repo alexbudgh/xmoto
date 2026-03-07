@@ -208,47 +208,9 @@ Texture *TextureManager::createTexture(const std::string &Name,
 #endif
 
   m_nTexSpaceUsage += pTexture->nSize;
-#ifdef ENABLE_SDLGFX
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-  Uint32 rmask = 0xff000000;
-  Uint32 gmask = 0x00ff0000;
-  Uint32 bmask = 0x0000ff00;
-  Uint32 amask = 0x000000ff;
-#else
-  Uint32 rmask = 0x000000ff;
-  Uint32 gmask = 0x0000ff00;
-  Uint32 bmask = 0x00ff0000;
-  Uint32 amask = 0xff000000;
-#endif
-
-  if (bAlpha) {
-    pTexture->surface = SDL_CreateRGBSurfaceFrom(pcData,
-                                                 nWidth,
-                                                 nHeight,
-                                                 32 /*bitsPerPixel */,
-                                                 nWidth * 4 /*pitch*/,
-                                                 rmask,
-                                                 gmask,
-                                                 bmask,
-                                                 amask);
-  } else {
-    pTexture->surface = SDL_CreateRGBSurfaceFrom(pcData,
-                                                 nWidth,
-                                                 nHeight,
-                                                 24 /*bitsPerPixel */,
-                                                 nWidth * 3 /*pitch*/,
-                                                 rmask,
-                                                 gmask,
-                                                 bmask,
-                                                 0);
-  }
-
-  pTexture->pcData = pcData;
-#else
   pTexture->surface = NULL;
   pTexture->pcData = NULL;
   delete[] pcData;
-#endif
 
   /* Do it captain */
   m_Textures.push_back(pTexture);
@@ -263,18 +225,8 @@ void TextureManager::destroyTexture(Texture *pTexture) {
   if (pTexture != NULL) {
     for (unsigned int i = 0; i < m_Textures.size(); i++) {
       if (m_Textures[i] == pTexture) {
-#ifdef ENABLE_SDLGFX
-        SDL_FreeSurface(pTexture->surface);
-#endif
 #ifdef ENABLE_OPENGL
         glDeleteTextures(1, (GLuint *)&pTexture->nID);
-#endif
-
-// keesj:todo when using SDL surface we cannot delete the image data
-// this is a problem.
-// delete [] pc; => it's why i keep pTexture->pcData
-#ifdef ENABLE_SDLGFX
-        delete[] pTexture->pcData;
 #endif
         m_nTexSpaceUsage -= pTexture->nSize;
         delete pTexture;

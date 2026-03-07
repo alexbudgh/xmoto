@@ -148,14 +148,14 @@ bool UIEdit::keyDown(int nKey, SDL_Keymod mod, const std::string &i_utf8Char) {
       return true;
 
     case SDLK_TAB:
-      if (mod & KMOD_SHIFT)
+      if (mod & SDL_KMOD_SHIFT)
         getRoot()->activatePrevious();
       else
         getRoot()->activateNext();
       return true;
 
-    case SDLK_v:
-      if (mod & KMOD_CTRL) {
+    case SDLK_V:
+      if (mod & SDL_KMOD_CTRL) {
         m_textEdit.insertFromClipboard();
         updateCaption();
       }
@@ -163,7 +163,7 @@ bool UIEdit::keyDown(int nKey, SDL_Keymod mod, const std::string &i_utf8Char) {
 
     case SDLK_LEFT:
       if (m_textEdit.cursorPos() > 0) {
-        if (mod & KMOD_CTRL) {
+        if (mod & SDL_KMOD_CTRL) {
           m_textEdit.jumpWordLeft();
         } else {
           m_textEdit.moveCursor(-1);
@@ -175,7 +175,7 @@ bool UIEdit::keyDown(int nKey, SDL_Keymod mod, const std::string &i_utf8Char) {
 
     case SDLK_RIGHT:
       if (m_textEdit.cursorPos() < utf8::utf8_length(m_textEdit.text())) {
-        if (mod & KMOD_CTRL) {
+        if (mod & SDL_KMOD_CTRL) {
           m_textEdit.jumpWordRight();
         } else {
           m_textEdit.moveCursor(1);
@@ -197,7 +197,7 @@ bool UIEdit::keyDown(int nKey, SDL_Keymod mod, const std::string &i_utf8Char) {
       return true;
 
     case SDLK_DELETE: {
-      if (mod & KMOD_CTRL) {
+      if (mod & SDL_KMOD_CTRL) {
         m_textEdit.deleteWordRight();
       } else {
         m_textEdit.deleteRight();
@@ -208,7 +208,7 @@ bool UIEdit::keyDown(int nKey, SDL_Keymod mod, const std::string &i_utf8Char) {
     }
 
     case SDLK_BACKSPACE: {
-      if (mod & KMOD_CTRL) {
+      if (mod & SDL_KMOD_CTRL) {
         m_textEdit.deleteWordLeft();
       } else {
         m_textEdit.deleteLeft();
@@ -239,7 +239,7 @@ bool UIEdit::joystickAxisMotion(JoyAxisEvent event) {
   return false;
 }
 
-bool UIEdit::joystickButtonDown(Uint8 i_joyNum, Uint8 i_joyButton) {
+bool UIEdit::joystickButtonDown(uint8_t i_joyNum, uint8_t i_joyButton) {
   // std::string  v_caption = getCaption();
   // unsigned int v_length  = utf8::utf8_length(v_caption);
   // std::string  v_begin;

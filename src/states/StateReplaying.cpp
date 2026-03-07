@@ -311,7 +311,7 @@ void StateReplaying::xmKey(InputEventType i_type, const XMKey &i_xmkey) {
     }
   }
 #if defined(ENABLE_DEV)
-  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_KP_0, KMOD_NONE)) {
+  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_KP_0, SDL_KMOD_NONE)) {
     // TRAINER
     /* store current bike position (for trainer) */
     if (m_universe != NULL) {

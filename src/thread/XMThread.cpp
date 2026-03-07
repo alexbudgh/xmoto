@@ -37,7 +37,7 @@ XMThread::XMThread(const std::string &i_dbKey, bool i_dbReadOnly) {
   m_curOpMutex = SDL_CreateMutex();
   m_curMicOpMutex = SDL_CreateMutex();
   m_sleepMutex = SDL_CreateMutex();
-  m_sleepCond = SDL_CreateCond();
+  m_sleepCond = SDL_CreateCondition();
   m_wakeUpInfos = "";
   m_safeKill = false;
   m_askSafeKill = false;
@@ -52,7 +52,7 @@ XMThread::~XMThread() {
   SDL_DestroyMutex(m_curOpMutex);
   SDL_DestroyMutex(m_curMicOpMutex);
   SDL_DestroyMutex(m_sleepMutex);
-  SDL_DestroyCond(m_sleepCond);
+  SDL_DestroyCondition(m_sleepCond);
   xmDatabase::destroy(m_dbKey);
 }
 
@@ -115,14 +115,14 @@ void XMThread::sleepThread() {
   m_isSleeping = true;
   m_askThreadToSleep = false;
 
-  SDL_CondWait(m_sleepCond, m_sleepMutex);
+  SDL_WaitCondition(m_sleepCond, m_sleepMutex);
   SDL_UnlockMutex(m_sleepMutex);
 }
 
 void XMThread::unsleepThread(std::string infos) {
   if (m_isSleeping == true) {
     SDL_LockMutex(m_sleepMutex);
-    SDL_CondSignal(m_sleepCond);
+    SDL_SignalCondition(m_sleepCond);
 
     m_isSleeping = false;
     m_wakeUpInfos = infos;

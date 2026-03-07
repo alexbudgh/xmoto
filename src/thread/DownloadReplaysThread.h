@@ -41,7 +41,7 @@ private:
   void play();
 
   WebRoom *m_pWebRoom;
-  SDL_mutex *m_urlsMutex;
+  SDL_Mutex *m_urlsMutex;
   StateManager *m_manager; // for the communication
   std::vector<std::string> m_replaysUrls;
 };

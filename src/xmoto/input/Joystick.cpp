@@ -37,16 +37,16 @@ float JoystickInput::joyRawToFloat(float raw, float max, float deadzone) {
   return 0.0f;
 }
 
-uint32_t JoystickInput::repeatTimerCallback(uint32_t interval, void *state) {
+uint32_t JoystickInput::repeatTimerCallback(void *state, SDL_TimerID timerID, uint32_t interval) {
   SDL_Event event = {};
   SDL_UserEvent userEvent = {};
 
-  userEvent.type = SDL_USEREVENT;
+  userEvent.type = SDL_EVENT_USER;
 
-  userEvent.code = SDL_CONTROLLERAXISMOTION;
+  userEvent.code = SDL_EVENT_GAMEPAD_AXIS_MOTION;
   userEvent.data1 = state;
 
-  event.type = SDL_USEREVENT;
+  event.type = SDL_EVENT_USER;
   event.user = userEvent;
 
   SDL_PushEvent(&event);
@@ -74,7 +74,7 @@ void JoystickInput::clearRepeatTimer(SDL_TimerID &timer) {
 }
 
 bool JoystickInput::joyAxisRepeat(JoyAxisEvent event) {
-  if (event.axis == (uint8_t)SDL_CONTROLLER_AXIS_INVALID)
+  if (event.axis == (uint8_t)SDL_GAMEPAD_AXIS_INVALID)
     return false;
 
   auto &axis = getAxesByJoyIndex(event.joystickNum)[event.axis];

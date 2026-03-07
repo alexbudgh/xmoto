@@ -19,7 +19,7 @@ static const int32_t JOYSTICK_DEADZONE_MENU = JOYSTICK_MAX_VALUE / 2;
 using JoyDir = int8_t;
 
 struct Joystick {
-  SDL_GameController *handle;
+  SDL_Gamepad *handle;
   std::string name;
   SDL_JoystickID id;
 
@@ -75,7 +75,7 @@ public:
 
   static float joyRawToFloat(float raw, float max, float deadzone);
 
-  static uint32_t repeatTimerCallback(uint32_t interval, void *state);
+  static uint32_t repeatTimerCallback(void *state, SDL_TimerID timerID, uint32_t interval);
 
   bool joyAxisRepeat(JoyAxisEvent event);
   void clearRepeatTimer(SDL_TimerID &timer);
@@ -84,7 +84,7 @@ public:
   void resetJoyAxes();
 
 private:
-  using JoyAxes = std::array<JoyAxis, SDL_CONTROLLER_AXIS_MAX>;
+  using JoyAxes = std::array<JoyAxis, SDL_GAMEPAD_AXIS_COUNT>;
   std::vector<JoyAxes> m_joyAxes;
   JoyAxisEvent m_joystickRepeat;
 

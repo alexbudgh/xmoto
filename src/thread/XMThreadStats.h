@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 class StateManager;
 
-struct SDL_mutex;
+struct SDL_Mutex;
 
 struct xmstats_event {
   std::string playerName;
@@ -63,7 +63,7 @@ public:
 private:
   void play();
 
-  SDL_mutex *m_eventsMutex;
+  SDL_Mutex *m_eventsMutex;
 
   std::string m_sitekey;
   StateManager *m_manager; // for the communication

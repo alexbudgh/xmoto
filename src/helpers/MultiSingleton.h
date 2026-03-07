@@ -185,7 +185,7 @@ protected:
 private:
   static std::map<std::string, T *> m_instances;
   static std::map<std::string, bool> m_enabledPropagations;
-  static SDL_mutex *m_pMutex;
+  static SDL_Mutex *m_pMutex;
   static bool m_isPropagating;
   static std::string m_defaultKey;
   bool m_isPropagator;
@@ -196,7 +196,7 @@ std::map<std::string, T *> MultiSingleton<T>::m_instances;
 template<typename T>
 std::map<std::string, bool> MultiSingleton<T>::m_enabledPropagations;
 template<typename T>
-SDL_mutex *MultiSingleton<T>::m_pMutex = NULL;
+SDL_Mutex *MultiSingleton<T>::m_pMutex = NULL;
 template<typename T>
 std::string MultiSingleton<T>::m_defaultKey = "";
 template<typename T>

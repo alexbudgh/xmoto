@@ -78,8 +78,8 @@ bool StateUpdateTheme::callBeforeLaunchingThread() {
 
 void StateUpdateTheme::xmKey(InputEventType i_type, const XMKey &i_xmkey) {
   if (i_type == INPUT_DOWN &&
-      (i_xmkey == XMKey(SDLK_ESCAPE, KMOD_NONE) ||
-       i_xmkey.getJoyButton() == SDL_CONTROLLER_BUTTON_B)) {
+      (i_xmkey == XMKey(SDLK_ESCAPE, SDL_KMOD_NONE) ||
+       i_xmkey.getJoyButton() == SDL_GAMEPAD_BUTTON_EAST)) {
     m_pThread->askThreadToEnd();
   }
 

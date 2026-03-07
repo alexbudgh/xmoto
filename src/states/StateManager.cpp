@@ -107,7 +107,7 @@ StateManager::StateManager() {
 
   // mouse
   m_isCursorVisible = false;
-  SDL_ShowCursor(SDL_DISABLE);
+  SDL_HideCursor();
   m_lastMouseMoveTime = GameApp::instance()->getXMTimeInt();
   m_lastMouseMoveTimeInZone = GameApp::instance()->getXMTimeInt();
   m_previousMouseX = 0;
@@ -1145,7 +1145,7 @@ void StateManager::setCursorVisible(bool visible) {
     return;
 
   m_isCursorVisible = visible;
-  SDL_ShowCursor(visible ? SDL_ENABLE : SDL_DISABLE);
+  if (visible) SDL_ShowCursor(); else SDL_HideCursor();
 }
 
 void StateManager::connectOrDisconnect() {

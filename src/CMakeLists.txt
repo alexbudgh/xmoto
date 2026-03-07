@@ -1,12 +1,12 @@
 option(STATIC_BUILD "Build a static executable" OFF)
 option(USE_OPENGL "Build with OpenGL for graphics" ON)
-option(USE_SDLGFX "Build with SDL2 for graphics" OFF)
 option(USE_GETTEXT "Build with Gettext for internationalization" ON)
 option(PREFER_SYSTEM_BZip2 "Prefer system BZip2" ON)
 option(PREFER_SYSTEM_Lua "Prefer system Lua" ON)
 option(PREFER_SYSTEM_XDG "Prefer system XDG" ON)
 option(ALLOW_DEV "Enable some development/debug features" OFF)
 option(BUILD_MACOS_BUNDLE "Build xmoto as a macOS Bundle" OFF)
+option(ENABLE_NETWORKING "Enable networking support (requires SDL_net)" OFF)
 
 if(CMAKE_GENERATOR MATCHES "Ninja")
   message("-- Using Ninja, try to colorize")
@@ -62,23 +62,9 @@ elseif (LUA_VERSION_STRING VERSION_GREATER_EQUAL "5.3")
     add_definitions("-DLUA_COMPAT_5_1")
 endif()
 
-# Can't disable yet
-if(ON OR USE_SDLGFX)
-  # This is a workaround required on some systems that ship a broken sdl2-config.cmake
-  find_library(SDL2_LIBRARIES NAMES SDL2 SDL2main)
-  if(NOT SDL2_LIBRARIES OR DEFINED ENV{NIX_STORE})
-    # NixOS include dirs are not in the usual places compared to other distros.
-    find_package(SDL2 REQUIRED)
-
-    if("${SDL2_LIBRARIES}" STREQUAL "")
-      set(SDL2_LIBRARIES SDL2::SDL2)
-    endif()
-  endif()
-
-  find_package(SDL2_mixer REQUIRED)
-  find_package(SDL2_net REQUIRED)
-  find_package(SDL2_ttf REQUIRED)
-endif()
+find_package(SDL3 REQUIRED)
+find_package(SDL3_mixer REQUIRED)
+find_package(SDL3_ttf REQUIRED)
 
 find_package(SQLITE3 REQUIRED)
 
@@ -182,11 +168,6 @@ if(USE_OPENGL)
     drawlib/DrawLibOpenGL.cpp drawlib/DrawLibOpenGL.h
   )
 endif()
-if(USE_SDLGFX)
-  list(APPEND drawlib_src
-    drawlib/DrawLibSDLgfx.cpp drawlib/DrawLibSDLgfx.h
-  )
-endif()
 
 set(gui_src
   gui/basic/GUI.cpp gui/basic/GUI.h
@@ -233,20 +214,24 @@ set(image_src
   image/tim_png.cpp
 )
 
-set(net_src
-  net/ActionReader.cpp net/ActionReader.h
-  net/BasicStructures.h
-  net/NetActions.cpp net/NetActions.h
-  net/NetClient.cpp net/NetClient.h
-  net/NetServer.cpp net/NetServer.h
-  net/ServerRules.cpp net/ServerRules.h
-  net/VirtualNetLevelsList.cpp net/VirtualNetLevelsList.h
-  net/extSDL_net.cpp net/extSDL_net.h
+if(ENABLE_NETWORKING)
+  set(net_src
+    net/ActionReader.cpp net/ActionReader.h
+    net/BasicStructures.h
+    net/NetActions.cpp net/NetActions.h
+    net/NetClient.cpp net/NetClient.h
+    net/NetServer.cpp net/NetServer.h
+    net/ServerRules.cpp net/ServerRules.h
+    net/VirtualNetLevelsList.cpp net/VirtualNetLevelsList.h
+    net/extSDL_net.cpp net/extSDL_net.h
 
-  net/helpers/Net.cpp net/helpers/Net.h
+    net/helpers/Net.cpp net/helpers/Net.h
 
-  net/thread/ServerThread.cpp net/thread/ServerThread.h
-)
+    net/thread/ServerThread.cpp net/thread/ServerThread.h
+  )
+else()
+  set(net_src net/NetStubs.cpp)
+endif()
 
 set(states_src
   states/AttractMode.cpp states/AttractMode.h
@@ -321,7 +306,6 @@ set(xmincludes_src
   include/xm_OpenGL.h
   include/xm_SDL.h
   include/xm_SDL_mixer.h
-  include/xm_SDL_net.h
   include/xm_SDL_ttf.h
   include/xm_endian.h
   include/xm_hashmap.h
@@ -484,10 +468,6 @@ target_include_directories(xmoto
   "${LIBXML2_INCLUDE_DIR}"
   "${Intl_INCLUDE_DIRS}"
 
-  "${SDL2_INCLUDE_DIRS}"
-  "${SDL2_MIXER_INCLUDE_DIR}"
-  "${SDL2_NET_INCLUDE_DIR}"
-  "${SDL2_TTF_INCLUDE_DIR}"
 
   "$<${USE_SYSTEM_Lua}:${LUA_INCLUDE_DIR}>"
 )
@@ -519,11 +499,11 @@ target_link_libraries(xmoto PUBLIC
   glad
   ${CMAKE_DL_LIBS}
   ${OPENGL_LIBRARIES}
+  ${OPENGL_glu_LIBRARY}
   ${PNG_LIBRARIES}
-  ${SDL2_LIBRARIES}
-  ${SDL2_MIXER_LIBRARY}
-  ${SDL2_NET_LIBRARY}
-  ${SDL2_TTF_LIBRARY}
+  SDL3::SDL3
+  SDL3_mixer::SDL3_mixer
+  SDL3_ttf::SDL3_ttf
   ${SQLITE3_LIBRARIES}
   $<${USE_SYSTEM_XDG}:${XDG_LIBRARY}>
   $<$<NOT:${USE_SYSTEM_XDG}>:xdgbasedir>
@@ -531,7 +511,7 @@ target_link_libraries(xmoto PUBLIC
   $<$<PLATFORM_ID:Darwin>:${COREFOUNDATION_LIBRARY}>
 )
 
-set_property(TARGET xmoto PROPERTY CXX_STANDARD 11)
+set_property(TARGET xmoto PROPERTY CXX_STANDARD 17)
 # strip release builds
 set_target_properties(xmoto PROPERTIES LINK_FLAGS_RELEASE -s)
 
@@ -551,8 +531,8 @@ if(USE_SYSTEM_Lua)
 endif()
 
 target_compile_definitions(xmoto PUBLIC USE_OPENGL=$<BOOL:${USE_OPENGL}>)
-target_compile_definitions(xmoto PUBLIC USE_SDLGFX=$<BOOL:${USE_SDLGFX}>)
 target_compile_definitions(xmoto PUBLIC USE_GETTEXT=$<BOOL:${USE_GETTEXT}>)
+target_compile_definitions(xmoto PUBLIC ENABLE_NETWORKING=$<BOOL:${ENABLE_NETWORKING}>)
 target_compile_definitions(xmoto PUBLIC ALLOW_DEV=$<BOOL:${ALLOW_DEV}>)
 target_compile_definitions(xmoto PUBLIC BUILD_MACOS_BUNDLE=$<BOOL:${BUILD_MACOS_BUNDLE}>)
 
@@ -716,10 +696,9 @@ message("LibLZMA    libraries: ${LIBLZMA_LIBRARIES}")
 message("Lua        libraries: ${LUA_LIBRARIES}")
 message("OpenGL     libraries: ${OPENGL_LIBRARIES}")
 message("Png        libraries: ${PNG_LIBRARIES}")
-message("SDL2       libraries: ${SDL2_LIBRARIES}")
-message("SDL2_mixer libraries: ${SDL2_MIXER_LIBRARY}")
-message("SDL2_net   libraries: ${SDL2_NET_LIBRARY}")
-message("SDL2_ttf   libraries: ${SDL2_TTF_LIBRARY}")
+message("SDL3       libraries: SDL3::SDL3")
+message("SDL3_mixer libraries: SDL3_mixer::SDL3_mixer")
+message("SDL3_ttf   libraries: SDL3_ttf::SDL3_ttf")
 message("Sqlite3    libraries: ${SQLITE3_LIBRARIES}")
 message("Xdg        libraries: ${XDG_LIBRARY}")
 message("Zlib       libraries: ${ZLIB_LIBRARIES}")

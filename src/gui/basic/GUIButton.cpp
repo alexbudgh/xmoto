@@ -390,9 +390,9 @@ bool UIButton::keyDown(int nKey,
   return false;
 }
 
-bool UIButton::joystickButtonDown(Uint8 i_joyNum, Uint8 i_joyButton) {
+bool UIButton::joystickButtonDown(uint8_t i_joyNum, uint8_t i_joyButton) {
   switch (i_joyButton) {
-    case SDL_CONTROLLER_BUTTON_A:
+    case SDL_GAMEPAD_BUTTON_SOUTH:
       toggle();
       return true;
   }

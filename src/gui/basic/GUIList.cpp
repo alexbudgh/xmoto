@@ -1009,13 +1009,13 @@ bool UIList::joystickAxisMotion(JoyAxisEvent event) {
   JoyDir dir = JoystickInput::getJoyAxisDir(event.axisValue);
 
   switch (event.axis) {
-    case SDL_CONTROLLER_AXIS_LEFTX:
+    case SDL_GAMEPAD_AXIS_LEFTX:
       if (dir < 0)
         eventLeft();
       else
         eventRight();
       return true;
-    case SDL_CONTROLLER_AXIS_LEFTY: {
+    case SDL_GAMEPAD_AXIS_LEFTY: {
       if (dir < 0)
         eventUp();
       else
@@ -1023,11 +1023,11 @@ bool UIList::joystickAxisMotion(JoyAxisEvent event) {
       return true;
     }
 
-    case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
+    case SDL_GAMEPAD_AXIS_LEFT_TRIGGER:
       if (!eventJump(-GUILIST_JUMP_COUNT))
         return true;
       break;
-    case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
+    case SDL_GAMEPAD_AXIS_RIGHT_TRIGGER:
       if (!eventJump(GUILIST_JUMP_COUNT))
         return true;
       break;
@@ -1036,21 +1036,21 @@ bool UIList::joystickAxisMotion(JoyAxisEvent event) {
   return false;
 }
 
-bool UIList::joystickButtonDown(Uint8 i_joyNum, Uint8 i_joyButton) {
+bool UIList::joystickButtonDown(uint8_t i_joyNum, uint8_t i_joyButton) {
   switch (i_joyButton) {
-    case SDL_CONTROLLER_BUTTON_A:
+    case SDL_GAMEPAD_BUTTON_SOUTH:
       eventGo();
       return true;
-    case SDL_CONTROLLER_BUTTON_DPAD_UP:
+    case SDL_GAMEPAD_BUTTON_DPAD_UP:
       eventUp();
       return true;
-    case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+    case SDL_GAMEPAD_BUTTON_DPAD_DOWN:
       eventDown();
       return true;
-    case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
+    case SDL_GAMEPAD_BUTTON_DPAD_LEFT:
       eventLeft();
       return true;
-    case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+    case SDL_GAMEPAD_BUTTON_DPAD_RIGHT:
       eventRight();
       return true;
   }

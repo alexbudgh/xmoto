@@ -63,7 +63,10 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include <sstream>
 
 void GameApp::getMousePos(int *pnX, int *pnY) {
-  SDL_GetMouseState(pnX, pnY);
+  float fx, fy;
+  SDL_GetMouseState(&fx, &fy);
+  if (pnX) *pnX = (int)fx;
+  if (pnY) *pnY = (int)fy;
 }
 
 /*===========================================================================
@@ -120,18 +123,18 @@ Init
 void GameApp::_InitWin(bool bInitGraphics) {
   /* Init SDL */
   if (bInitGraphics == false) {
-    if (SDL_Init(SDL_INIT_TIMER) < 0)
+    if (!SDL_Init(0))
       throw Exception("(1) SDL_Init : " + std::string(SDL_GetError()));
 
     /* No graphics mojo here, thank you */
     return;
   } else {
-    if (SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO) < 0)
+    if (!SDL_Init(SDL_INIT_VIDEO))
       throw Exception("(2) SDL_Init : " + std::string(SDL_GetError()));
   }
 
-  if (TTF_Init() < 0) {
-    throw Exception("Initializing TTF failed: " + std::string(TTF_GetError()));
+  if (!TTF_Init()) {
+    throw Exception("Initializing TTF failed: " + std::string(SDL_GetError()));
   }
 
   atexit(TTF_Quit);

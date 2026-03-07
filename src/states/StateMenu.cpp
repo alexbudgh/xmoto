@@ -80,10 +80,10 @@ bool StateMenu::render() {
 
 void StateMenu::xmKey(InputEventType i_type, const XMKey &i_xmkey) {
   int nX, nY;
-  Uint8 nButton;
-  Sint32 wheelX, wheelY;
+  uint8_t nButton;
+  int32_t wheelX, wheelY;
   JoyAxisEvent axisEvent;
-  Uint8 v_joyButton;
+  uint8_t v_joyButton;
   SDL_Keycode v_nKey;
   SDL_Keymod v_mod;
   std::string v_utf8Char;

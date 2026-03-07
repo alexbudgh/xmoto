@@ -232,12 +232,12 @@ void StatePlaying::handleScriptKeys(InputEventType Type, const XMKey &i_xmkey) {
 
 void StatePlaying::dealWithActivedKeys() {
   int numkeys = 0;
-  const Uint8 *v_keystate = SDL_GetKeyboardState(&numkeys);
+  const bool *v_keystate = SDL_GetKeyboardState(&numkeys);
   if (!v_keystate) {
     throw Exception("dealWithActivedKeys: SDL_GetKeyboardState returned NULL");
   }
 
-  Uint8 v_mousestate = SDL_GetMouseState(NULL, NULL);
+  uint32_t v_mousestate = SDL_GetMouseState(NULL, NULL);
   unsigned int p, pW;
   Biker *v_biker;
 
@@ -306,7 +306,7 @@ void StatePlaying::dealWithActivedKeys() {
            */
           && !(Input::instance()
                  ->getPlayerKey(INPUT_CHANGEDIR, p)
-                 ->getJoyButton() == SDL_CONTROLLER_BUTTON_A)) {
+                 ->getJoyButton() == SDL_GAMEPAD_BUTTON_SOUTH)) {
         /* Change dir */
         if (m_changeDirKeyAlreadyPress[p] == false) {
           v_biker->getControler()->setChangeDir(true);

@@ -192,7 +192,7 @@ private:
     XMotoLoadLevelsInterface *i_loadLevelsInterface = NULL);
 
   std::vector<LevelsPack *> m_levelsPacks;
-  SDL_mutex *m_levelsPackMutex;
+  SDL_Mutex *m_levelsPackMutex;
 };
 
 #endif /* __LEVELSMANAGER__ */

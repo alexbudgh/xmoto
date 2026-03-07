@@ -499,7 +499,7 @@ bool UIMsgBox::keyDown(int nKey,
       return true;
 
     case SDLK_LEFT:
-      if (mod & KMOD_CTRL) {
+      if (mod & SDL_KMOD_CTRL) {
         m_textEdit.jumpWordLeft();
       } else {
         m_textEdit.moveCursor(-1);
@@ -507,7 +507,7 @@ bool UIMsgBox::keyDown(int nKey,
       return true;
 
     case SDLK_RIGHT:
-      if (mod & KMOD_CTRL) {
+      if (mod & SDL_KMOD_CTRL) {
         m_textEdit.jumpWordRight();
       } else {
         m_textEdit.moveCursor(1);
@@ -522,8 +522,8 @@ bool UIMsgBox::keyDown(int nKey,
       m_textEdit.jumpToEnd();
       return true;
 
-    case SDLK_v:
-      if (mod & KMOD_CTRL)
+    case SDLK_V:
+      if (mod & SDL_KMOD_CTRL)
         m_textEdit.insertFromClipboard();
 
       return true;
@@ -532,7 +532,7 @@ bool UIMsgBox::keyDown(int nKey,
       if (m_bTextInput) {
         switch (nKey) {
           case SDLK_BACKSPACE:
-            if (mod & KMOD_CTRL) {
+            if (mod & SDL_KMOD_CTRL) {
               m_textEdit.deleteWordLeft();
             } else {
               m_textEdit.deleteLeft();
@@ -543,7 +543,7 @@ bool UIMsgBox::keyDown(int nKey,
             return true;
 
           case SDLK_DELETE:
-            if (mod & KMOD_CTRL) {
+            if (mod & SDL_KMOD_CTRL) {
               m_textEdit.deleteWordRight();
             } else {
               m_textEdit.deleteRight();
@@ -554,7 +554,7 @@ bool UIMsgBox::keyDown(int nKey,
             return true;
 
           case SDLK_TAB:
-            bool show = mod & KMOD_SHIFT;
+            bool show = mod & SDL_KMOD_SHIFT;
             showMatch(show);
             return true;
         }
@@ -1302,12 +1302,12 @@ void UIRoot::mouseHover(int x, int y) {
   _RootMouseEvent(this, evt);
 }
 
-void UIRoot::mouseWheelUp(int x, int y, Sint16 wheelX, Sint16 wheelY) {
+void UIRoot::mouseWheelUp(int x, int y, int16_t wheelX, int16_t wheelY) {
   UIRootMouseEvent evt = { UI_ROOT_MOUSE_WHEEL_UP, x, y };
   _RootMouseEvent(this, evt);
 }
 
-void UIRoot::mouseWheelDown(int x, int y, Sint16 wheelX, Sint16 wheelY) {
+void UIRoot::mouseWheelDown(int x, int y, int16_t wheelX, int16_t wheelY) {
   UIRootMouseEvent evt = { UI_ROOT_MOUSE_WHEEL_DOWN, x, y };
   _RootMouseEvent(this, evt);
 }
@@ -1329,7 +1329,7 @@ bool UIRoot::keyDown(int nKey, SDL_Keymod mod, const std::string &i_utf8Char) {
         activateRight();
         return true;
       case SDLK_TAB:
-        if (mod & KMOD_SHIFT)
+        if (mod & SDL_KMOD_SHIFT)
           activatePrevious();
         else
           activateNext();
@@ -1393,13 +1393,13 @@ bool UIRoot::joystickAxisMotion(JoyAxisEvent event) {
   JoyDir dir = JoystickInput::getJoyAxisDir(event.axisValue);
 
   switch (event.axis) {
-    case SDL_CONTROLLER_AXIS_LEFTX:
+    case SDL_GAMEPAD_AXIS_LEFTX:
       if (dir < 0)
         activateLeft();
       else
         activateRight();
       return true;
-    case SDL_CONTROLLER_AXIS_LEFTY:
+    case SDL_GAMEPAD_AXIS_LEFTY:
       if (dir < 0)
         activateUp();
       else
@@ -1410,19 +1410,19 @@ bool UIRoot::joystickAxisMotion(JoyAxisEvent event) {
   return false;
 }
 
-bool UIRoot::joystickButtonDown(Uint8 i_joyNum, Uint8 i_joyButton) {
+bool UIRoot::joystickButtonDown(uint8_t i_joyNum, uint8_t i_joyButton) {
   if (!_RootJoystickButtonDownEvent(this, i_joyNum, i_joyButton)) {
     switch (i_joyButton) {
-      case SDL_CONTROLLER_BUTTON_DPAD_UP:
+      case SDL_GAMEPAD_BUTTON_DPAD_UP:
         activateUp();
         return true;
-      case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+      case SDL_GAMEPAD_BUTTON_DPAD_DOWN:
         activateDown();
         return true;
-      case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
+      case SDL_GAMEPAD_BUTTON_DPAD_LEFT:
         activateLeft();
         return true;
-      case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+      case SDL_GAMEPAD_BUTTON_DPAD_RIGHT:
         activateRight();
         return true;
     }
@@ -1451,8 +1451,8 @@ bool UIRoot::_RootJoystickAxisMotionEvent(UIWindow *pWindow,
 }
 
 bool UIRoot::_RootJoystickButtonDownEvent(UIWindow *pWindow,
-                                          Uint8 i_joyNum,
-                                          Uint8 i_joyButton) {
+                                          uint8_t i_joyNum,
+                                          uint8_t i_joyButton) {
   /* Hidden or disabled? */
   if (pWindow->isHidden() || pWindow->isDisabled())
     return false;
@@ -1575,13 +1575,13 @@ void UIRoot::deactivate(UIWindow *pWindow) {
 Async. mouse state
 ===========================================================================*/
 bool UIWindow::isMouseLDown(void) {
-  if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(1))
+  if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON_MASK(1))
     return true;
   return false;
 }
 
 bool UIWindow::isMouseRDown(void) {
-  if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(2))
+  if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON_MASK(2))
     return true;
   return false;
 }

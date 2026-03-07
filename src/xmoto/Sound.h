@@ -34,11 +34,9 @@ Sound sample
 struct SoundSample {
   int nBufSize;
   unsigned char *pcBuf;
-  SDL_AudioCVT cvt;
   std::string Name;
 
-  /* Used by SDL_mixer */
-  Mix_Chunk *pChunk;
+  MIX_Audio *pAudio;
 };
 
 /*===========================================================================
@@ -81,7 +79,6 @@ public:
 
   static void update(void);
 
-  // static void playStream(std::string File);
   static SoundSample *loadSample(const std::string &File);
   static void playSample(SoundSample *pSample,
                          float fVolume = DEFAULT_SAMPLE_VOLUME);
@@ -105,36 +102,26 @@ public:
 
   static bool m_activ;
 
-private:
-  /* SDL audio callback */
-  // static void audioCallback(void *pvUserData,unsigned char *pcStream,int
-  // nLen);
+  static MIX_Mixer *getMixer() { return m_pMixer; }
 
-  /* SDL_mixer callbacks (RWops) */
-  static int64_t RWops_size(SDL_RWops *context);
-  static int64_t RWops_seek(SDL_RWops *context, int64_t offset, int whence);
-  static size_t RWops_read(SDL_RWops *context,
-                           void *ptr,
-                           size_t size,
-                           size_t maxnum);
-  static size_t RWops_write(SDL_RWops *context,
-                            const void *ptr,
-                            size_t size,
-                            size_t num);
-  static int RWops_close(SDL_RWops *context);
+private:
+  /* SDL_mixer callbacks (IOStream) */
+  static Sint64 IOStream_size(void *userdata);
+  static Sint64 IOStream_seek(void *userdata, Sint64 offset, SDL_IOWhence whence);
+  static size_t IOStream_read(void *userdata, void *ptr, size_t size, SDL_IOStatus *status);
+  static size_t IOStream_write(void *userdata, const void *ptr, size_t size, SDL_IOStatus *status);
+  static bool IOStream_close(void *userdata);
 
   /* Data */
-  static int m_nSampleRate; /* From config: AudioSampleRate */
-  static int m_nSampleBits; /* From config: AudioSampleBits */
-  static int m_nChannels; /* From config: AudioChannels */
-
-  // static SDL_AudioSpec m_ASpec;
-  //
-  // static SoundPlayer *m_pPlayers[16];
+  static int m_nSampleRate;
+  static int m_nSampleBits;
+  static int m_nChannels;
 
   static std::vector<SoundSample *> m_Samples;
 
-  static Mix_Music *m_pMenuMusic;
+  static MIX_Mixer *m_pMixer;
+  static MIX_Track *m_pMusicTrack;
+  static MIX_Audio *m_pMenuMusic;
   static bool m_isInitialized;
 };
 

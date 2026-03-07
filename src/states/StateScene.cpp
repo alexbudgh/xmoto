@@ -521,7 +521,7 @@ void StateScene::xmKey(InputEventType i_type, const XMKey &i_xmkey) {
     }
   }
 #if defined(ENABLE_DEV)
-  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_KP_7, KMOD_NONE)) {
+  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_KP_7, SDL_KMOD_NONE)) {
     /* Zoom in */
     if (m_universe != NULL) {
       for (unsigned int j = 0; j < m_universe->getScenes().size(); j++) {
@@ -535,7 +535,7 @@ void StateScene::xmKey(InputEventType i_type, const XMKey &i_xmkey) {
     }
   }
 
-  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_KP_9, KMOD_NONE)) {
+  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_KP_9, SDL_KMOD_NONE)) {
     /* Zoom out */
     if (m_universe != NULL) {
       for (unsigned int j = 0; j < m_universe->getScenes().size(); j++) {
@@ -549,7 +549,7 @@ void StateScene::xmKey(InputEventType i_type, const XMKey &i_xmkey) {
     }
   }
 
-  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_HOME, KMOD_NONE)) {
+  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_HOME, SDL_KMOD_NONE)) {
     if (m_universe != NULL) {
       for (unsigned int j = 0; j < m_universe->getScenes().size(); j++) {
         for (unsigned int i = 0;
@@ -562,7 +562,7 @@ void StateScene::xmKey(InputEventType i_type, const XMKey &i_xmkey) {
     }
   }
 
-  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_KP_6, KMOD_NONE)) {
+  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_KP_6, SDL_KMOD_NONE)) {
     if (m_universe != NULL) {
       for (unsigned int j = 0; j < m_universe->getScenes().size(); j++) {
         for (unsigned int i = 0;
@@ -575,7 +575,7 @@ void StateScene::xmKey(InputEventType i_type, const XMKey &i_xmkey) {
     }
   }
 
-  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_KP_4, KMOD_NONE)) {
+  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_KP_4, SDL_KMOD_NONE)) {
     if (m_universe != NULL) {
       for (unsigned int j = 0; j < m_universe->getScenes().size(); j++) {
         for (unsigned int i = 0;
@@ -588,7 +588,7 @@ void StateScene::xmKey(InputEventType i_type, const XMKey &i_xmkey) {
     }
   }
 
-  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_KP_8, KMOD_NONE)) {
+  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_KP_8, SDL_KMOD_NONE)) {
     if (m_universe != NULL) {
       for (unsigned int j = 0; j < m_universe->getScenes().size(); j++) {
         for (unsigned int i = 0;
@@ -601,7 +601,7 @@ void StateScene::xmKey(InputEventType i_type, const XMKey &i_xmkey) {
     }
   }
 
-  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_KP_2, KMOD_NONE)) {
+  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_KP_2, SDL_KMOD_NONE)) {
     if (m_universe != NULL) {
       for (unsigned int j = 0; j < m_universe->getScenes().size(); j++) {
         for (unsigned int i = 0;
@@ -615,7 +615,7 @@ void StateScene::xmKey(InputEventType i_type, const XMKey &i_xmkey) {
   }
 #endif
 
-  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_v, KMOD_LCTRL)) {
+  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_V, SDL_KMOD_LCTRL)) {
     if (XMSession::instance()->adminMode()) {
       if (m_universe != NULL) {
         if (m_universe->getScenes().size() == 1) {

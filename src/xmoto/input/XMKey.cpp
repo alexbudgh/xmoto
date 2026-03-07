@@ -28,55 +28,54 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 XMKey::XMKey() {
   m_type = XMK_NONE;
-  m_joyButton = SDL_CONTROLLER_BUTTON_INVALID;
+  m_joyButton = SDL_GAMEPAD_BUTTON_INVALID;
   m_repetition = 0;
 }
 
-XMKey::XMKey(Uint8 nButton, unsigned int i_repetition) {
+XMKey::XMKey(MouseTag, uint8_t nButton, unsigned int i_repetition) {
   m_type = XMK_MOUSEBUTTON;
   m_mouseButton_button = nButton;
-  m_joyButton = SDL_CONTROLLER_BUTTON_INVALID;
+  m_joyButton = SDL_GAMEPAD_BUTTON_INVALID;
   m_repetition = i_repetition;
 }
 
 XMKey::XMKey(SDL_Event &i_event) {
   m_repetition = 0;
-  m_joyButton = SDL_CONTROLLER_BUTTON_INVALID;
+  m_joyButton = SDL_GAMEPAD_BUTTON_INVALID;
 
   switch (i_event.type) {
-    case SDL_KEYDOWN:
+    case SDL_EVENT_KEY_DOWN:
       m_type = XMK_KEYBOARD;
       m_keyboard_sym =
-        i_event.key.keysym
-          .sym; // Change this back to scancode if it doesn't work
-      m_keyboard_mod = (SDL_Keymod)(i_event.key.keysym.mod &
-                                    (KMOD_CTRL | KMOD_SHIFT | KMOD_ALT |
-                                     KMOD_GUI)); // only allow these modifiers
+        i_event.key.key; // Change this back to scancode if it doesn't work
+      m_keyboard_mod = (SDL_Keymod)(i_event.key.mod &
+                                    (SDL_KMOD_CTRL | SDL_KMOD_SHIFT | SDL_KMOD_ALT |
+                                     SDL_KMOD_GUI)); // only allow these modifiers
       m_repetition = i_event.key.repeat;
       break;
 
-    case SDL_MOUSEBUTTONDOWN:
+    case SDL_EVENT_MOUSE_BUTTON_DOWN:
       m_type = XMK_MOUSEBUTTON;
       m_mouseButton_button = i_event.button.button;
       break;
 
-    case SDL_MOUSEWHEEL:
+    case SDL_EVENT_MOUSE_WHEEL:
       m_type = XMK_MOUSEWHEEL;
       m_wheelX = i_event.wheel.x;
       m_wheelY = i_event.wheel.y;
       break;
 
-    case SDL_CONTROLLERAXISMOTION:
+    case SDL_EVENT_GAMEPAD_AXIS_MOTION:
       m_type = XMK_JOYSTICKAXIS;
-      m_joystick = Input::instance()->getJoyById(i_event.caxis.which);
-      m_joyAxis = i_event.caxis.axis;
-      m_joyAxisValue = i_event.caxis.value;
+      m_joystick = Input::instance()->getJoyById(i_event.gaxis.which);
+      m_joyAxis = i_event.gaxis.axis;
+      m_joyAxisValue = i_event.gaxis.value;
       break;
 
-    case SDL_CONTROLLERBUTTONDOWN:
+    case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
       m_type = XMK_JOYSTICKBUTTON;
-      m_joystick = Input::instance()->getJoyById(i_event.cbutton.which);
-      m_joyButton = i_event.cbutton.button;
+      m_joystick = Input::instance()->getJoyById(i_event.gbutton.which);
+      m_joyButton = i_event.gbutton.button;
       break;
 
     default:
@@ -90,26 +89,26 @@ XMKey::XMKey(SDL_Keycode nKey,
              int repetition) {
   m_type = XMK_KEYBOARD;
   m_keyboard_sym = nKey;
-  m_keyboard_mod = (SDL_Keymod)(mod & (KMOD_CTRL | KMOD_SHIFT | KMOD_ALT |
-                                       KMOD_GUI)); // only allow these modifiers
+  m_keyboard_mod = (SDL_Keymod)(mod & (SDL_KMOD_CTRL | SDL_KMOD_SHIFT | SDL_KMOD_ALT |
+                                       SDL_KMOD_GUI)); // only allow these modifiers
   m_keyboard_utf8Char = i_utf8Char;
-  m_joyButton = SDL_CONTROLLER_BUTTON_INVALID;
+  m_joyButton = SDL_GAMEPAD_BUTTON_INVALID;
   m_repetition = repetition;
 }
 
-XMKey::XMKey(Joystick *joystick, Uint8 i_joyButton) {
+XMKey::XMKey(Joystick *joystick, uint8_t i_joyButton) {
   m_type = XMK_JOYSTICKBUTTON;
   m_joystick = joystick;
   m_joyButton = i_joyButton;
   m_repetition = 0;
 }
 
-XMKey::XMKey(Joystick *joystick, Uint8 i_joyAxis, Sint16 i_joyAxisValue) {
+XMKey::XMKey(Joystick *joystick, uint8_t i_joyAxis, int16_t i_joyAxisValue) {
   m_type = XMK_JOYSTICKAXIS;
   m_joystick = joystick;
   m_joyAxis = i_joyAxis;
   m_joyAxisValue = i_joyAxisValue;
-  m_joyButton = SDL_CONTROLLER_BUTTON_INVALID;
+  m_joyButton = SDL_GAMEPAD_BUTTON_INVALID;
   m_repetition = 0;
 }
 
@@ -118,7 +117,7 @@ XMKey::XMKey(const std::string &i_key, bool i_basicMode) {
   std::string v_current, v_rest;
 
   m_repetition = 0;
-  m_joyButton = SDL_CONTROLLER_BUTTON_INVALID;
+  m_joyButton = SDL_GAMEPAD_BUTTON_INVALID;
 
   if (i_basicMode) {
     m_type = XMK_KEYBOARD;
@@ -128,7 +127,7 @@ XMKey::XMKey(const std::string &i_key, bool i_basicMode) {
     }
     m_keyboard_sym = (SDL_Keymod)((
       int)(tolower(i_key[0]))); // give ascii key while sdl does the same
-    m_keyboard_mod = KMOD_NONE;
+    m_keyboard_mod = SDL_KMOD_NONE;
     return;
   }
 
@@ -159,12 +158,12 @@ XMKey::XMKey(const std::string &i_key, bool i_basicMode) {
     m_keyboard_sym = (SDL_Keycode)std::strtoul(v_current.c_str(), nullptr, 0);
     m_keyboard_mod =
       (SDL_Keymod)(((SDL_Keymod)std::strtoul(v_rest.c_str(), nullptr, 0)) &
-                   (KMOD_CTRL | KMOD_SHIFT | KMOD_ALT |
-                    KMOD_GUI)); // only allow these modifiers
+                   (SDL_KMOD_CTRL | SDL_KMOD_SHIFT | SDL_KMOD_ALT |
+                    SDL_KMOD_GUI)); // only allow these modifiers
 
   } else if (v_current == "M") { // mouse button
     m_type = XMK_MOUSEBUTTON;
-    m_mouseButton_button = (Uint8)std::strtoul(v_rest.c_str(), nullptr, 0);
+    m_mouseButton_button = (uint8_t)std::strtoul(v_rest.c_str(), nullptr, 0);
 
   } else if (v_current == "A") { // joystick axis
     m_type = XMK_JOYSTICKAXIS;
@@ -176,7 +175,7 @@ XMKey::XMKey(const std::string &i_key, bool i_basicMode) {
     }
     v_current = v_rest.substr(0, pos);
     v_rest = v_rest.substr(pos + 1, v_rest.length() - pos - 1);
-    m_joyAxis = (Uint8)std::strtoul(v_current.c_str(), nullptr, 0);
+    m_joyAxis = (uint8_t)std::strtoul(v_current.c_str(), nullptr, 0);
 
     // get the axis value
     pos = v_rest.find(":", 0);
@@ -185,7 +184,7 @@ XMKey::XMKey(const std::string &i_key, bool i_basicMode) {
     }
     v_current = v_rest.substr(0, pos);
     v_rest = v_rest.substr(pos + 1, v_rest.length() - pos - 1);
-    m_joyAxisValue = (Sint16)std::strtol(v_current.c_str(), nullptr, 0);
+    m_joyAxisValue = (int16_t)std::strtol(v_current.c_str(), nullptr, 0);
 
     SDL_JoystickID id =
       (SDL_JoystickID)std::strtoul(v_rest.c_str(), nullptr, 0);
@@ -203,7 +202,7 @@ XMKey::XMKey(const std::string &i_key, bool i_basicMode) {
     SDL_JoystickID id =
       (SDL_JoystickID)std::strtoul(v_rest.c_str(), nullptr, 0);
     m_joystick = Input::instance()->getJoyById(id);
-    m_joyButton = (Uint8)std::strtoul(v_current.c_str(), nullptr, 0);
+    m_joyButton = (uint8_t)std::strtoul(v_current.c_str(), nullptr, 0);
   } else {
     throw InvalidSystemKeyException();
   }
@@ -277,7 +276,7 @@ bool XMKey::operator==(const XMKey &i_other) const {
   bool equals = equalsIgnoreMods(i_other);
 
   if (m_type == XMK_KEYBOARD) {
-    int mods = KMOD_CTRL | KMOD_SHIFT | KMOD_ALT | KMOD_GUI;
+    int mods = SDL_KMOD_CTRL | SDL_KMOD_SHIFT | SDL_KMOD_ALT | SDL_KMOD_GUI;
     return equals &&
            ((m_keyboard_mod & mods) == (i_other.m_keyboard_mod & mods));
   }
@@ -321,8 +320,8 @@ std::string XMKey::toFancyString() const {
     std::string v_modifiers;
 
     static constexpr SDL_Keymod modKeys[] = {
-      KMOD_LCTRL, KMOD_RCTRL, KMOD_LALT,   KMOD_RALT,
-      KMOD_LGUI,  KMOD_RGUI,  KMOD_LSHIFT, KMOD_RSHIFT,
+      SDL_KMOD_LCTRL, SDL_KMOD_RCTRL, SDL_KMOD_LALT,   SDL_KMOD_RALT,
+      SDL_KMOD_LGUI,  SDL_KMOD_RGUI,  SDL_KMOD_LSHIFT, SDL_KMOD_RSHIFT,
     };
 
     for (auto &mod : modKeys) {
@@ -358,10 +357,8 @@ std::string XMKey::toFancyString() const {
     v_res << "[" << GAMETEXT_MOUSE << "] " << v_button;
   } else if (m_type == XMK_JOYSTICKAXIS || m_type == XMK_JOYSTICKBUTTON) {
     v_res << "[" << GAMETEXT_JOYSTICK << "] " << m_joystick->name
-#if SDL_VERSION_ATLEAST(2, 0, 9)
           << " - player "
-          << SDL_GameControllerGetPlayerIndex(m_joystick->handle)
-#endif
+          << SDL_GetGamepadPlayerIndex(m_joystick->handle)
           << " - ";
 
     if (m_type == XMK_JOYSTICKAXIS) {
@@ -408,21 +405,21 @@ std::string XMKey::toFancyString() const {
 
 const char *XMKey::modKeyString(SDL_Keymod modKey) {
   switch (modKey) {
-    case KMOD_LCTRL:
+    case SDL_KMOD_LCTRL:
       return GAMETEXT_KEY_LEFTCONTROL;
-    case KMOD_RCTRL:
+    case SDL_KMOD_RCTRL:
       return GAMETEXT_KEY_RIGHTCONTROL;
-    case KMOD_LALT:
+    case SDL_KMOD_LALT:
       return GAMETEXT_KEY_LEFTALT;
-    case KMOD_RALT:
+    case SDL_KMOD_RALT:
       return GAMETEXT_KEY_RIGHTALT;
-    case KMOD_LGUI:
+    case SDL_KMOD_LGUI:
       return GAMETEXT_KEY_LEFTMETA;
-    case KMOD_RGUI:
+    case SDL_KMOD_RGUI:
       return GAMETEXT_KEY_RIGHTMETA;
-    case KMOD_LSHIFT:
+    case SDL_KMOD_LSHIFT:
       return GAMETEXT_KEY_LEFTSHIFT;
-    case KMOD_RSHIFT:
+    case SDL_KMOD_RSHIFT:
       return GAMETEXT_KEY_RIGHTSHIFT;
     default:
       return "?";
@@ -433,34 +430,34 @@ bool XMKey::isModKeyDown(SDL_Keymod modKey) const {
   return (m_keyboard_mod & modKey) == modKey;
 }
 
-bool XMKey::isPressed(const Uint8 *i_keystate,
-                      Uint8 i_mousestate,
+bool XMKey::isPressed(const bool *i_keystate,
+                      uint32_t i_mousestate,
                       int numkeys) const {
   if (m_type == XMK_KEYBOARD) {
-    SDL_Scancode scancode = SDL_GetScancodeFromKey(m_keyboard_sym);
+    SDL_Scancode scancode = SDL_GetScancodeFromKey(m_keyboard_sym, NULL);
 
     if (scancode >= numkeys)
       return false;
 
-    return i_keystate[scancode] == 1;
+    return i_keystate[scancode];
   }
 
   if (m_type == XMK_MOUSEBUTTON) {
-    return (i_mousestate & SDL_BUTTON(m_mouseButton_button)) ==
-           SDL_BUTTON(m_mouseButton_button);
+    return (i_mousestate & SDL_BUTTON_MASK(m_mouseButton_button)) ==
+           SDL_BUTTON_MASK(m_mouseButton_button);
   }
 
   if (m_type == XMK_JOYSTICKAXIS) {
-    Sint16 v_axisValue = SDL_GameControllerGetAxis(
-      m_joystick->handle, (SDL_GameControllerAxis)m_joyAxis);
+    int16_t v_axisValue = SDL_GetGamepadAxis(
+      m_joystick->handle, (SDL_GamepadAxis)m_joyAxis);
 
     return JoystickInput::axesMatch(
       v_axisValue, m_joyAxisValue, JOYSTICK_DEADZONE_BASE);
   }
 
   if (m_type == XMK_JOYSTICKBUTTON) {
-    return SDL_GameControllerGetButton(
-             m_joystick->handle, (SDL_GameControllerButton)m_joyButton) == 1;
+    return SDL_GetGamepadButton(
+             m_joystick->handle, (SDL_GamepadButton)m_joyButton);
   }
 
   return false;
@@ -480,7 +477,7 @@ bool XMKey::toKeyboard(SDL_Keycode &nKey,
   return true;
 }
 
-bool XMKey::toMouse(int &nX, int &nY, Uint8 &nButton) const {
+bool XMKey::toMouse(int &nX, int &nY, uint8_t &nButton) const {
   if (m_type != XMK_MOUSEBUTTON) {
     return false;
   }
@@ -492,8 +489,8 @@ bool XMKey::toMouse(int &nX, int &nY, Uint8 &nButton) const {
 
 bool XMKey::toMouseWheel(int &nX,
                          int &nY,
-                         Sint32 &wheelX,
-                         Sint32 &wheelY) const {
+                         int32_t &wheelX,
+                         int32_t &wheelY) const {
   if (m_type != XMK_MOUSEWHEEL) {
     return false;
   }
@@ -507,7 +504,7 @@ bool XMKey::toMouseWheel(int &nX,
   return true;
 }
 
-bool XMKey::toJoystickButton(Uint8 &o_joyNum, Uint8 &o_joyButton) const {
+bool XMKey::toJoystickButton(uint8_t &o_joyNum, uint8_t &o_joyButton) const {
   if (m_type != XMK_JOYSTICKBUTTON) {
     return false;
   }

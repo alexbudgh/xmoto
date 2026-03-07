@@ -64,11 +64,12 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "thread/UpgradeLevelsThread.h"
 
 #include "UserConfig.h"
-#include "include/xm_SDL_net.h"
+#if ENABLE_NETWORKING
 #include "net/ActionReader.h"
 #include "net/NetActions.h"
 #include "net/NetClient.h"
 #include "net/NetServer.h"
+#endif
 
 #if !defined(WIN32)
 #include <signal.h>
@@ -141,6 +142,7 @@ void xmexit_term(int i_signal) {
   // it seems that it doesn't help return on first line of this function to go
   // back to the previous function
 
+#if ENABLE_NETWORKING
   if (GameApp::instance()->standAloneServer() != NULL) {
     if (Logger::isInitialized()) {
       LogInfo("signal received.");
@@ -149,6 +151,7 @@ void xmexit_term(int i_signal) {
     GameApp::instance()->run_unload();
     GameApp::destroy();
   }
+#endif
   exit(0);
 }
 
@@ -426,10 +429,12 @@ void GameApp::run_load(int nNumArgs, char **ppcArgs) {
   }
 
   // no command line need the network for the moment
+#if ENABLE_NETWORKING
   if (v_useGraphics || v_xmArgs.isOptServerOnly()) {
     initNetwork(v_xmArgs.isOptServerOnly(),
                 v_xmArgs.isOptServerOnly() || v_graphicAutomaticMode);
   }
+#endif
 
   /* Init renderer */
   if (v_useGraphics) {
@@ -633,6 +638,7 @@ void GameApp::run_load(int nNumArgs, char **ppcArgs) {
     _UpdateLoadingShell(); // no more loading screen
   }
 
+#if ENABLE_NETWORKING
   if (v_xmArgs.isOptServerOnly()) {
     try {
       // start the server
@@ -652,7 +658,9 @@ void GameApp::run_load(int nNumArgs, char **ppcArgs) {
     quit();
     return;
 
-  } else {
+  } else
+#endif
+  {
     /* try to not run sql at the same time you enter in the main menu (a thread
      * to compute packs is run (concurrency)) */
 
@@ -680,10 +688,12 @@ void GameApp::run_load(int nNumArgs, char **ppcArgs) {
     } else {
       /* display what must be displayed */
       StateManager::instance()->pushState(new StateMainMenu());
+#if ENABLE_NETWORKING
       if (XMSession::instance()->clientGhostMode() == false &&
           NetClient::instance()->isConnected()) {
         StateManager::instance()->pushState(new StateWaitServerInstructions());
       }
+#endif
     }
 
     /* display error information to the player */
@@ -703,9 +713,9 @@ void GameApp::manageEvent(SDL_Event *Event) {
   int nX, nY;
   std::string utf8Char;
 
-  if (Event->type == SDL_KEYDOWN || Event->type == SDL_KEYUP) {
+  if (Event->type == SDL_EVENT_KEY_DOWN || Event->type == SDL_EVENT_KEY_UP) {
     /* ignore modifier-only key presses */
-    switch (Event->key.keysym.sym) {
+    switch (Event->key.key) {
       case SDLK_RSHIFT:
       case SDLK_LSHIFT:
       case SDLK_RCTRL:
@@ -718,41 +728,41 @@ void GameApp::manageEvent(SDL_Event *Event) {
     }
   }
 
-  SDL_StartTextInput();
+  SDL_StartTextInput(GameApp::instance()->getDrawLib()->getWindow());
 
   switch (Event->type) {
-    case SDL_TEXTINPUT:
+    case SDL_EVENT_TEXT_INPUT:
       utf8Char = Event->text.text;
 
       StateManager::instance()->xmKey(INPUT_TEXT,
                                       XMKey(0, (SDL_Keymod)0, utf8Char));
       break;
 
-    case SDL_KEYDOWN:
-      utf8Char = unicode2utf8(Event->key.keysym.sym);
+    case SDL_EVENT_KEY_DOWN:
+      utf8Char = unicode2utf8(Event->key.key);
 
       StateManager::instance()->xmKey(INPUT_DOWN,
-                                      XMKey(Event->key.keysym.sym,
-                                            (SDL_Keymod)Event->key.keysym.mod,
+                                      XMKey(Event->key.key,
+                                            (SDL_Keymod)Event->key.mod,
                                             utf8Char,
                                             Event->key.repeat));
       break;
 
-    case SDL_KEYUP:
-      utf8Char = unicode2utf8(Event->key.keysym.sym);
+    case SDL_EVENT_KEY_UP:
+      utf8Char = unicode2utf8(Event->key.key);
 
       StateManager::instance()->xmKey(INPUT_UP,
-                                      XMKey(Event->key.keysym.sym,
-                                            (SDL_Keymod)Event->key.keysym.mod,
+                                      XMKey(Event->key.key,
+                                            (SDL_Keymod)Event->key.mod,
                                             utf8Char));
       break;
 
-    case SDL_QUIT:
+    case SDL_EVENT_QUIT:
       /* Force quit */
       quit();
       break;
 
-    case SDL_MOUSEBUTTONDOWN:
+    case SDL_EVENT_MOUSE_BUTTON_DOWN:
       /* Is this a double click? */
       getMousePos(&nX, &nY);
       if (nX == nLastMouseClickX && nY == nLastMouseClickY &&
@@ -760,11 +770,11 @@ void GameApp::manageEvent(SDL_Event *Event) {
           (getXMTime() - fLastMouseClickTime) < MOUSE_DBCLICK_TIME) {
         /* Pass double click */
         StateManager::instance()->xmKey(INPUT_DOWN,
-                                        XMKey(Event->button.button, 1));
+                                        XMKey(XMKey::Mouse, Event->button.button, 1));
       } else {
         /* Pass ordinary click */
         StateManager::instance()->xmKey(INPUT_DOWN,
-                                        XMKey(Event->button.button));
+                                        XMKey(XMKey::Mouse, Event->button.button));
       }
       fLastMouseClickTime = getXMTime();
       nLastMouseClickX = nX;
@@ -772,21 +782,21 @@ void GameApp::manageEvent(SDL_Event *Event) {
       nLastMouseClickButton = Event->button.button;
 
       break;
-    case SDL_MOUSEBUTTONUP:
-      StateManager::instance()->xmKey(INPUT_UP, XMKey(Event->button.button));
+    case SDL_EVENT_MOUSE_BUTTON_UP:
+      StateManager::instance()->xmKey(INPUT_UP, XMKey(XMKey::Mouse, Event->button.button));
       break;
-    case SDL_MOUSEWHEEL:
+    case SDL_EVENT_MOUSE_WHEEL:
       StateManager::instance()->xmKey(INPUT_SCROLL, XMKey(*Event));
       break;
-    case SDL_CONTROLLERAXISMOTION:
+    case SDL_EVENT_GAMEPAD_AXIS_MOTION:
       StateManager::instance()->xmKey(
-        Input::instance()->joystickAxisSens(Event->caxis.value),
-        XMKey(Input::instance()->getJoyById(Event->cbutton.which),
-              Event->caxis.axis,
-              Event->caxis.value));
+        Input::instance()->joystickAxisSens(Event->gaxis.value),
+        XMKey(Input::instance()->getJoyById(Event->gbutton.which),
+              Event->gaxis.axis,
+              Event->gaxis.value));
       break;
-    case SDL_USEREVENT: {
-      if (Event->user.code == SDL_CONTROLLERAXISMOTION) {
+    case SDL_EVENT_USER: {
+      if (Event->user.code == SDL_EVENT_GAMEPAD_AXIS_MOTION) {
         const auto &event = *(static_cast<JoyAxisEvent *>(Event->user.data1));
         StateMenu *state =
           dynamic_cast<StateMenu *>(StateManager::instance()->getTopState());
@@ -797,92 +807,69 @@ void GameApp::manageEvent(SDL_Event *Event) {
       break;
     }
 
-    case SDL_CONTROLLERBUTTONDOWN: {
-      case SDL_CONTROLLERBUTTONUP:
+    case SDL_EVENT_GAMEPAD_BUTTON_DOWN: {
+      case SDL_EVENT_GAMEPAD_BUTTON_UP:
         InputEventType type = Input::eventState(Event->type);
-        XMKey key = XMKey(Input::instance()->getJoyById(Event->cbutton.which),
-                          Event->cbutton.button);
+        XMKey key = XMKey(Input::instance()->getJoyById(Event->gbutton.which),
+                          Event->gbutton.button);
         StateManager::instance()->xmKey(type, key);
         break;
     }
 
-    case SDL_WINDOWEVENT: {
-      bool hasFocus = false;
-
-      switch (Event->window.event) {
-        case SDL_WINDOWEVENT_ENTER:
-        case SDL_WINDOWEVENT_LEAVE: {
-          switch (Event->window.event) {
-            case SDL_WINDOWEVENT_ENTER:
-              hasFocus = true;
-              break;
-            case SDL_WINDOWEVENT_LEAVE:
-              hasFocus = false;
-              break;
-          }
-
-          if (!m_hasKeyboardFocus)
-            StateManager::instance()->changeFocus(hasFocus);
-
-          m_hasMouseFocus = hasFocus;
-          break;
-        }
-        case SDL_WINDOWEVENT_FOCUS_GAINED: /* fall through */
-        case SDL_WINDOWEVENT_FOCUS_LOST: {
-          switch (Event->window.event) {
-            case SDL_WINDOWEVENT_FOCUS_GAINED:
-              hasFocus = true;
-              break;
-            case SDL_WINDOWEVENT_FOCUS_LOST:
-              hasFocus = false;
-              break;
-          }
-
-          if (hasFocus) {
-            // Pending keydown events need to be flushed after gaining focus
-            // because SDL2 will send them for keys that were pressed outside
-            // the game (e.g. when alt-tabbing in)
-            SDL_FlushEvents(SDL_KEYDOWN, SDL_KEYDOWN);
-          } else {
-            /*
-             * With SDL2, input events come in in the opposite order from SDL1.2
-             * (the order used to be: "focus lost" -> "key released").
-             * We need to invalidate the keys here so they don't persist after
-             * focus is lost
-             */
-            StatePlayingLocal *state = dynamic_cast<StatePlayingLocal *>(
-              StateManager::instance()->getTopState());
-            if (state)
-              state->dealWithActivedKeys();
-          }
-
-          if (!m_hasMouseFocus)
-            StateManager::instance()->changeFocus(hasFocus);
-
-          m_hasKeyboardFocus = hasFocus;
-          break;
-        }
-        case SDL_WINDOWEVENT_EXPOSED:
-          StateManager::instance()->setInvalidated(true);
-          break;
-        case SDL_WINDOWEVENT_SHOWN:
-          StateManager::instance()->changeVisibility(true);
-          m_isIconified = false;
-          break;
-        case SDL_WINDOWEVENT_HIDDEN:
-          StateManager::instance()->changeVisibility(false);
-          m_isIconified = true;
-          break;
-      }
-
+    case SDL_EVENT_WINDOW_MOUSE_ENTER: {
+      if (!m_hasKeyboardFocus)
+        StateManager::instance()->changeFocus(true);
+      m_hasMouseFocus = true;
       break;
     }
-    case SDL_DROPFILE: {
-      char *file = Event->drop.file;
-      std::string path(file);
-      SDL_free(file);
-      StateManager::instance()->fileDrop(path);
+    case SDL_EVENT_WINDOW_MOUSE_LEAVE: {
+      if (!m_hasKeyboardFocus)
+        StateManager::instance()->changeFocus(false);
+      m_hasMouseFocus = false;
+      break;
+    }
+    case SDL_EVENT_WINDOW_FOCUS_GAINED: {
+      // Pending keydown events need to be flushed after gaining focus
+      // because SDL2 will send them for keys that were pressed outside
+      // the game (e.g. when alt-tabbing in)
+      SDL_FlushEvents(SDL_EVENT_KEY_DOWN, SDL_EVENT_KEY_DOWN);
 
+      if (!m_hasMouseFocus)
+        StateManager::instance()->changeFocus(true);
+
+      m_hasKeyboardFocus = true;
+      break;
+    }
+    case SDL_EVENT_WINDOW_FOCUS_LOST: {
+      /*
+       * We need to invalidate the keys here so they don't persist after
+       * focus is lost
+       */
+      StatePlayingLocal *state = dynamic_cast<StatePlayingLocal *>(
+        StateManager::instance()->getTopState());
+      if (state)
+        state->dealWithActivedKeys();
+
+      if (!m_hasMouseFocus)
+        StateManager::instance()->changeFocus(false);
+
+      m_hasKeyboardFocus = false;
+      break;
+    }
+    case SDL_EVENT_WINDOW_EXPOSED:
+      StateManager::instance()->setInvalidated(true);
+      break;
+    case SDL_EVENT_WINDOW_SHOWN:
+      StateManager::instance()->changeVisibility(true);
+      m_isIconified = false;
+      break;
+    case SDL_EVENT_WINDOW_HIDDEN:
+      StateManager::instance()->changeVisibility(false);
+      m_isIconified = true;
+      break;
+    case SDL_EVENT_DROP_FILE: {
+      std::string path(Event->drop.data);
+      StateManager::instance()->fileDrop(path);
       break;
     }
   }
@@ -909,6 +896,7 @@ void GameApp::run_loop() {
     */
 
     // computer the delta
+#if ENABLE_NETWORKING
     if (NetClient::instance()->isConnected()) {
       v_frameTime = 1000 / StateManager::instance()->getMaxFps();
 
@@ -922,6 +910,7 @@ void GameApp::run_loop() {
       }
       m_lastFrameTimeStamp = GameApp::getXMTimeInt();
     }
+#endif
     //
 
     // update the game
@@ -952,6 +941,7 @@ void GameApp::run_loop() {
 
     // update graphics
     // skip rendering if too much late (network mode)
+#if ENABLE_NETWORKING
     if (NetClient::instance()->isConnected()) {
       if (m_frameLate < XM_MAX_FRAMELATE_TO_FORCE_NORENDERING ||
           m_loopWithoutRendering > XM_MAX_NB_LOOPS_WITH_NORENDERING) {
@@ -961,12 +951,15 @@ void GameApp::run_loop() {
         m_loopWithoutRendering++;
         // printf("skip rendering (%i)\n", m_loopWithoutRendering);
       }
-    } else {
+    } else
+#endif
+    {
       StateManager::instance()->render();
     }
 
     // update network
     // skip network update if not the time
+#if ENABLE_NETWORKING
     if (NetClient::instance()->isConnected()) {
       int v_timeout = v_frameTime -
                       (GameApp::getXMTimeInt() - m_lastFrameTimeStamp) -
@@ -986,7 +979,9 @@ void GameApp::run_loop() {
       } else {
         m_loopWithoutNetwork++;
       }
-    } else {
+    } else
+#endif
+    {
       /* pause system without having to wait for the net at the same time */
       if (XMSession::instance()->timedemo() == false) {
         GameApp::wait(m_lastFrameTimeStamp,
@@ -1188,6 +1183,7 @@ void GameApp::_UpdateLoadingScreen(const std::string &NextTask,
 
 void GameApp::initNetwork(bool i_forceNoServerStarted,
                           bool i_forceNoClientStarted) {
+#if ENABLE_NETWORKING
   if (SDLNet_Init() == -1) {
     throw Exception(SDLNet_GetError());
   }
@@ -1238,9 +1234,11 @@ void GameApp::initNetwork(bool i_forceNoServerStarted,
       }
     }
   }
+#endif
 }
 
 void GameApp::uninitNetwork() {
+#if ENABLE_NETWORKING
   // stop the client
   if (NetClient::instance()->isConnected()) {
     NetClient::instance()->disconnect();
@@ -1259,4 +1257,5 @@ void GameApp::uninitNetwork() {
   }
 
   SDLNet_Quit();
+#endif
 }

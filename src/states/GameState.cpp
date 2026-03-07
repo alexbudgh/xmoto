@@ -322,14 +322,14 @@ void GameState::xmKey(InputEventType i_type, const XMKey &i_xmkey) {
     return;
   }
 
-  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_RETURN, KMOD_LALT)) {
+  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_RETURN, SDL_KMOD_LALT)) {
     gameApp->getDrawLib()->toogleFullscreen();
     XMSession::instance()->setWindowed(XMSession::instance()->windowed() ==
                                        false);
     return;
   }
 
-  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_i, KMOD_LCTRL)) {
+  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_I, SDL_KMOD_LCTRL)) {
     /* activate/desactivate interpolation */
     XMSession::instance()->setEnableReplayInterpolation(
       !XMSession::instance()->enableReplayInterpolation());
@@ -343,19 +343,19 @@ void GameState::xmKey(InputEventType i_type, const XMKey &i_xmkey) {
     return;
   }
 
-  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_m, KMOD_LCTRL)) {
+  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_M, SDL_KMOD_LCTRL)) {
     XMSession::instance()->setMirrorMode(XMSession::instance()->mirrorMode() ==
                                          false);
     StateManager::instance()->sendAsynchronousMessage("MIRRORMODE_CHANGED");
   }
 
-  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_o, KMOD_LCTRL)) {
+  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_O, SDL_KMOD_LCTRL)) {
     // do not open stateOptions over stateOptions
     if (!StateManager::instance()->isThereASuchState("StateOptions"))
       StateManager::instance()->pushState(new StateOptions());
   }
 
-  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_s, KMOD_LCTRL)) {
+  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_S, SDL_KMOD_LCTRL)) {
     GameApp::instance()->toogleEnableMusic();
   }
 
@@ -453,7 +453,7 @@ void GameState::xmKey(InputEventType i_type, const XMKey &i_xmkey) {
     SysMessage::instance()->showConsole();
   }
 
-  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_t, KMOD_LCTRL)) {
+  else if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_T, SDL_KMOD_LCTRL)) {
     XMSession::instance()->setEnableTrailCam(
       !XMSession::instance()->enableTrailCam());
     StateManager::instance()->sendAsynchronousMessage("CHANGE_TRAILCAM");

@@ -279,41 +279,21 @@ void DrawLibOpenGL::init(unsigned int nDispWidth,
   m_nDispHeight = nDispHeight;
   m_bWindowed = bWindowed;
 
-  /* Get some video info */
-  const SDL_RendererInfo *pVidInfo = NULL;
-
-  const int displayIndex = 0;
-  int displayModeCount = 0;
-  if ((displayModeCount = SDL_GetNumDisplayModes(displayIndex)) < 1) {
-    throw Exception("DrawLib: No display modes found.");
-  }
-  std::vector<SDL_DisplayMode> modes(displayModeCount);
-
-  for (int modeIndex = 0; modeIndex < displayModeCount; ++modeIndex) {
-    SDL_DisplayMode mode;
-    if (SDL_GetDisplayMode(displayIndex, modeIndex, &mode) != 0) {
-      throw Exception("getDisplayModes: SDL_GetDisplayMode failed: " +
-                      std::string(SDL_GetError()));
-    }
-    modes[modeIndex] = mode;
-  }
-
   /* Setup GL stuff */
   /* 2005-10-05 ... note that we no longer ask for explicit settings... it's
      better to do it per auto */
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
 
   /* Create video flags */
-  int nFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
+  int nFlags = SDL_WINDOW_OPENGL;
   if (!m_bWindowed) {
-    nFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+    nFlags |= SDL_WINDOW_FULLSCREEN;
   }
 
   /* At last, try to "set the video mode" */
   std::string title = std::string("X-Moto ") + XMBuild::getVersionString(true);
   if ((m_window = SDL_CreateWindow(title.c_str(),
-                                   SDL_WINDOWPOS_UNDEFINED,
-                                   SDL_WINDOWPOS_UNDEFINED,
                                    m_nDispWidth,
                                    m_nDispHeight,
                                    nFlags)) == NULL) {
@@ -328,11 +308,9 @@ void DrawLibOpenGL::init(unsigned int nDispWidth,
     LogWarning("Trying %ix%i in windowed mode", m_nDispWidth, m_nDispHeight);
 
     if ((m_window = SDL_CreateWindow(title.c_str(),
-                                     SDL_WINDOWPOS_UNDEFINED,
-                                     SDL_WINDOWPOS_UNDEFINED,
                                      m_nDispWidth,
                                      m_nDispHeight,
-                                     SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL)) ==
+                                     SDL_WINDOW_OPENGL)) ==
         NULL) {
       throw Exception("SDL_CreateWindow: " + std::string(SDL_GetError()));
     }
@@ -348,16 +326,16 @@ void DrawLibOpenGL::init(unsigned int nDispWidth,
     SDL_LoadBMP((XMFS::getSystemDataDir() + std::string("/xmoto.bmp")).c_str());
   if (v_icon != NULL) {
     SDL_SetSurfaceBlendMode(v_icon, SDL_BLENDMODE_BLEND);
-    SDL_SetColorKey(v_icon, SDL_TRUE, SDL_MapRGB(v_icon->format, 236, 45, 211));
+    SDL_SetSurfaceColorKey(v_icon, true, SDL_MapSurfaceRGB(v_icon, 236, 45, 211));
     SDL_SetWindowIcon(m_window, v_icon);
-    SDL_FreeSurface(v_icon);
+    SDL_DestroySurface(v_icon);
   }
 #endif
 
-  SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
+  SDL_SetEventEnabled(SDL_EVENT_DROP_FILE, true);
 
   /* Create an OpenGL context */
-  SDL_GLContext m_glContext = SDL_GL_CreateContext(m_window);
+  m_glContext = SDL_GL_CreateContext(m_window);
 
   if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
     /* Try without SDL's loader */
@@ -444,7 +422,7 @@ void DrawLibOpenGL::init(unsigned int nDispWidth,
 
 void DrawLibOpenGL::unInit() {
   if (m_glContext) {
-    SDL_GL_DeleteContext(m_glContext);
+    SDL_GL_DestroyContext(m_glContext);
     m_glContext = NULL;
   }
   if (m_window) {
@@ -620,27 +598,10 @@ void DrawLibOpenGL::flushGraphics() {
 
 // little helper to avoid code duplication
 SDL_Surface *createSDLSurface(unsigned int width, unsigned int height) {
-  SDL_Surface *surf = SDL_CreateRGBSurface(SDL_SWSURFACE,
-                                           width,
-                                           height,
-                                           32,
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN /* OpenGL RGBA masks */
-                                           0x000000FF,
-                                           0x0000FF00,
-                                           0x00FF0000,
-                                           0xFF000000
-#else
-                                           0xFF000000,
-                                           0x00FF0000,
-                                           0x0000FF00,
-                                           0x000000FF
-#endif
-  );
+  SDL_Surface *surf = SDL_CreateSurface(width, height, SDL_PIXELFORMAT_RGBA32);
   if (surf == NULL) {
-    SDL_FreeSurface(surf);
-    throw Exception("SDL_CreateRGBSurface failed");
+    throw Exception("SDL_CreateSurface failed");
   }
-
   return surf;
 }
 
@@ -656,7 +617,7 @@ ScrapTextures::ScrapTextures() {
 
 ScrapTextures::~ScrapTextures() {
   for (unsigned int i = 0; i < MAX_SCRAPS; i++) {
-    SDL_FreeSurface(m_scrapsTexels[i]);
+    SDL_DestroySurface(m_scrapsTexels[i]);
   }
   glDeleteTextures(MAX_SCRAPS, (GLuint *)&m_scrapsTextures);
 }
@@ -785,14 +746,14 @@ GLFontGlyphLetter::GLFontGlyphLetter(const std::string &i_value,
   SDL_Surface *v_image;
   SDL_Color v_color = { 0xFF, 0xFF, 0xFF, 0x00 };
 
-  v_surf = TTF_RenderUTF8_Blended(i_ttf, i_value.c_str(), v_color);
+  v_surf = TTF_RenderText_Blended(i_ttf, i_value.c_str(), 0, v_color);
   if (v_surf == NULL) {
-    // throw Exception("GLFontGlyphLetter: " + std::string(TTF_GetError()));
+    // throw Exception("GLFontGlyphLetter: " + std::string(SDL_GetError()));
     // sometimes, it happends with some special char, give a 2nd chance
 
-    v_surf = TTF_RenderUTF8_Blended(i_ttf, " ", v_color);
+    v_surf = TTF_RenderText_Blended(i_ttf, " ", 0, v_color);
     if (v_surf == NULL) {
-      throw Exception("GLFontGlyphLetter: " + std::string(TTF_GetError()));
+      throw Exception("GLFontGlyphLetter: " + std::string(SDL_GetError()));
     }
   }
   SDL_SetSurfaceAlphaMod(v_surf, 255);
@@ -801,7 +762,7 @@ GLFontGlyphLetter::GLFontGlyphLetter(const std::string &i_value,
   SDL_SetSurfaceBlendMode(v_surf, SDL_BLENDMODE_NONE);
 
   int v_realWidth, v_realHeight;
-  TTF_SizeUTF8(i_ttf, i_value.c_str(), &v_realWidth, &v_realHeight);
+  TTF_GetStringSize(i_ttf, i_value.c_str(), 0, &v_realWidth, &v_realHeight);
   m_realWidth = (unsigned int)v_realWidth;
   m_realHeight = (unsigned int)v_realHeight;
 
@@ -811,7 +772,7 @@ GLFontGlyphLetter::GLFontGlyphLetter(const std::string &i_value,
 
   // hack because ttf even width fixed fonts return not perfectly fixed fonts
   if (i_fixedFontSize != 0) {
-    if (TTF_FontFaceIsFixedWidth(i_ttf)) {
+    if (TTF_FontIsFixedWidth(i_ttf)) {
       m_drawWidth = m_realWidth = i_fixedFontSize;
     }
   }
@@ -821,7 +782,7 @@ GLFontGlyphLetter::GLFontGlyphLetter(const std::string &i_value,
     try {
       m_GLID = ScrapTextures::instance()->allocateAndLoadTexture(
         m_drawWidth, m_drawHeight, &m_u.x, &m_u.y, &m_v.x, &m_v.y, v_surf);
-      SDL_FreeSurface(v_surf);
+      SDL_DestroySurface(v_surf);
 
       m_useScrap = true;
     } catch (Exception) {
@@ -837,7 +798,7 @@ GLFontGlyphLetter::GLFontGlyphLetter(const std::string &i_value,
 
     /* Copy the surface into the GL texture image */
     SDL_BlitSurface(v_surf, NULL, v_image, NULL);
-    SDL_FreeSurface(v_surf);
+    SDL_DestroySurface(v_surf);
 
     /* Create the OpenGL texture */
     glGenTextures(1, &m_GLID);
@@ -853,7 +814,7 @@ GLFontGlyphLetter::GLFontGlyphLetter(const std::string &i_value,
                  GL_RGBA,
                  GL_UNSIGNED_BYTE,
                  v_image->pixels);
-    SDL_FreeSurface(v_image);
+    SDL_DestroySurface(v_image);
 
     m_u.x = 0.0;
     m_u.y = 0.0;

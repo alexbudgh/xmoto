@@ -61,11 +61,13 @@ public:
         SDL_Keymod mod,
         const std::string &i_utf8Char = "",
         int repetition = 0); // keyboard
-  XMKey(Uint8 nButton, unsigned int i_repetition = 0); // mouse
-  XMKey(Joystick *joystick, Uint8 i_joyButton); // joystick button
+  struct MouseTag {};
+  static constexpr MouseTag Mouse{};
+  XMKey(MouseTag, uint8_t nButton, unsigned int i_repetition = 0); // mouse
+  XMKey(Joystick *joystick, uint8_t i_joyButton); // joystick button
   XMKey(Joystick *joystick,
-        Uint8 i_joyAxis,
-        Sint16 i_joyAxisValue); // joystick axis
+        uint8_t i_joyAxis,
+        int16_t i_joyAxisValue); // joystick axis
 
   bool operator==(const XMKey &i_other) const;
   bool equalsIgnoreMods(const XMKey &i_other) const;
@@ -73,8 +75,8 @@ public:
   std::string toFancyString() const;
   static const char *modKeyString(SDL_Keymod modKey);
   bool isModKeyDown(SDL_Keymod modKey) const;
-  bool isPressed(const Uint8 *i_keystate,
-                 Uint8 i_mousestate,
+  bool isPressed(const bool *i_keystate,
+                 uint32_t i_mousestate,
                  int numkeys) const;
 
   inline bool isDefined() const { return m_type != XMK_NONE; }
@@ -89,28 +91,28 @@ public:
   bool toKeyboard(SDL_Keycode &nKey,
                   SDL_Keymod &o_mod,
                   std::string &o_utf8Char) const;
-  bool toMouse(int &nX, int &nY, Uint8 &nButton) const;
-  bool toMouseWheel(int &nX, int &nY, Sint32 &wheelX, Sint32 &wheelY) const;
-  bool toJoystickButton(Uint8 &o_joyNum, Uint8 &o_joyButton) const;
+  bool toMouse(int &nX, int &nY, uint8_t &nButton) const;
+  bool toMouseWheel(int &nX, int &nY, int32_t &wheelX, int32_t &wheelY) const;
+  bool toJoystickButton(uint8_t &o_joyNum, uint8_t &o_joyButton) const;
   bool toJoystickAxisMotion(JoyAxisEvent &event) const;
 
   inline SDL_Keycode getKeyboardSym() const { return m_keyboard_sym; }
   inline SDL_Keymod getKeyboardMod() const { return m_keyboard_mod; }
 
-  inline Uint8 getJoyButton() const { return m_joyButton; }
+  inline uint8_t getJoyButton() const { return m_joyButton; }
 
 private:
   XMKey_input m_type;
   SDL_Keycode m_keyboard_sym;
   SDL_Keymod m_keyboard_mod;
   std::string m_keyboard_utf8Char;
-  Uint8 m_mouseButton_button;
-  Sint32 m_wheelX, m_wheelY;
+  uint8_t m_mouseButton_button;
+  int32_t m_wheelX, m_wheelY;
 
   Joystick *m_joystick;
-  Uint8 m_joyButton;
-  Uint8 m_joyAxis;
-  Sint16 m_joyAxisValue;
+  uint8_t m_joyButton;
+  uint8_t m_joyAxis;
+  int16_t m_joyAxisValue;
   unsigned int m_repetition;
 };
 

@@ -198,7 +198,7 @@ public:
     return false;
   }
   virtual bool joystickAxisMotion(JoyAxisEvent event) { return false; }
-  virtual bool joystickButtonDown(Uint8 i_joyNum, Uint8 i_joyButton) {
+  virtual bool joystickButtonDown(uint8_t i_joyNum, uint8_t i_joyButton) {
     return false;
   }
   virtual bool offerActivation(void) { return false; }
@@ -387,7 +387,7 @@ public:
                          SDL_Keymod mod,
                          const std::string &i_utf8Char);
   virtual bool joystickAxisMotion(JoyAxisEvent event);
-  virtual bool joystickButtonDown(Uint8 i_joyNum, Uint8 i_joyButton);
+  virtual bool joystickButtonDown(uint8_t i_joyNum, uint8_t i_joyButton);
 
   virtual bool offerActivation(void) { return true; }
   void hideText(bool bHideText) {
@@ -710,7 +710,7 @@ public:
   virtual void mouseOut(int x, int y);
   virtual bool offerActivation(void);
   virtual bool keyDown(int nKey, SDL_Keymod mod, const std::string &i_utf8Char);
-  virtual bool joystickButtonDown(Uint8 i_joyNum, Uint8 i_joyButton);
+  virtual bool joystickButtonDown(uint8_t i_joyNum, uint8_t i_joyButton);
 
   /* Data interface */
   UIButtonState getState(void) { return m_State; }
@@ -802,7 +802,7 @@ public:
   virtual bool offerActivation(void);
   virtual bool keyDown(int nKey, SDL_Keymod mod, const std::string &i_utf8Char);
   virtual bool joystickAxisMotion(JoyAxisEvent event);
-  virtual bool joystickButtonDown(Uint8 i_joyNum, Uint8 i_joyButton);
+  virtual bool joystickButtonDown(uint8_t i_joyNum, uint8_t i_joyButton);
   virtual std::string subContextHelp(int x, int y);
 
   /* if position != -1, force the entry to this position */
@@ -1029,15 +1029,15 @@ public:
   virtual void mouseRDown(int x, int y);
   virtual void mouseRUp(int x, int y);
   virtual void mouseHover(int x, int y);
-  virtual void mouseWheelUp(int x, int y, Sint16 wheelX, Sint16 wheelY);
-  virtual void mouseWheelDown(int x, int y, Sint16 wheelX, Sint16 wheelY);
+  virtual void mouseWheelUp(int x, int y, int16_t wheelX, int16_t wheelY);
+  virtual void mouseWheelDown(int x, int y, int16_t wheelX, int16_t wheelY);
   virtual bool keyDown(int nKey, SDL_Keymod mod, const std::string &i_utf8Char);
   virtual bool keyUp(int nKey, SDL_Keymod mod, const std::string &i_utf8Char);
   virtual bool textInput(int nKey,
                          SDL_Keymod mod,
                          const std::string &i_utf8Char);
   virtual bool joystickAxisMotion(JoyAxisEvent event);
-  virtual bool joystickButtonDown(Uint8 i_joyNum, Uint8 i_joyButton);
+  virtual bool joystickButtonDown(uint8_t i_joyNum, uint8_t i_joyButton);
 
   void deactivate(UIWindow *pWindow);
 
@@ -1066,8 +1066,8 @@ private:
 
   bool _RootJoystickAxisMotionEvent(UIWindow *pWindow, JoyAxisEvent event);
   bool _RootJoystickButtonDownEvent(UIWindow *pWindow,
-                                    Uint8 i_joyNum,
-                                    Uint8 i_joyButton);
+                                    uint8_t i_joyNum,
+                                    uint8_t i_joyButton);
 
   bool _RootMouseEvent(UIWindow *pWindow, UIRootMouseEvent Event);
   void _RootPaint(int x, int y, UIWindow *pWindow, UIRect *pRect);

@@ -230,12 +230,12 @@ bool UIConsole::keyDown(int nKey,
                         SDL_Keymod mod,
                         const std::string &i_utf8Char) {
   // EOF
-  if (nKey == SDLK_d && (mod & KMOD_CTRL) && m_textEdit.text().empty()) {
+  if (nKey == SDLK_D && (mod & SDL_KMOD_CTRL) && m_textEdit.text().empty()) {
     execInternal("exit");
     return true;
   }
 
-  if (nKey == SDLK_l && (mod & KMOD_CTRL)) {
+  if (nKey == SDLK_L && (mod & SDL_KMOD_CTRL)) {
     clear();
     return true;
   }
@@ -252,7 +252,7 @@ bool UIConsole::keyDown(int nKey,
     }
 
     case SDLK_BACKSPACE: {
-      if (mod & KMOD_CTRL)
+      if (mod & SDL_KMOD_CTRL)
         m_textEdit.deleteWordLeft();
       else
         m_textEdit.deleteLeft();
@@ -261,7 +261,7 @@ bool UIConsole::keyDown(int nKey,
     }
 
     case SDLK_DELETE: {
-      if (mod & KMOD_CTRL)
+      if (mod & SDL_KMOD_CTRL)
         m_textEdit.deleteWordRight();
       else
         m_textEdit.deleteRight();
@@ -305,7 +305,7 @@ bool UIConsole::keyDown(int nKey,
     }
 
     case SDLK_LEFT: {
-      if (mod & KMOD_CTRL)
+      if (mod & SDL_KMOD_CTRL)
         m_textEdit.jumpWordLeft();
       else
         m_textEdit.moveCursor(-1);
@@ -314,7 +314,7 @@ bool UIConsole::keyDown(int nKey,
     }
 
     case SDLK_RIGHT: {
-      if (mod & KMOD_CTRL)
+      if (mod & SDL_KMOD_CTRL)
         m_textEdit.jumpWordRight();
       else
         m_textEdit.moveCursor(1);
@@ -337,15 +337,15 @@ bool UIConsole::keyDown(int nKey,
       break;
     }
 
-    case SDLK_v: {
-      if (mod & KMOD_CTRL)
+    case SDLK_V: {
+      if (mod & SDL_KMOD_CTRL)
         m_textEdit.insertFromClipboard();
 
       break;
     }
 
-    case SDLK_c: {
-      if (mod & KMOD_CTRL) {
+    case SDLK_C: {
+      if (mod & SDL_KMOD_CTRL) {
         appendScrollback(PROMPT_CHAR + m_textEdit.text() + "^C");
         addNewLine();
 
@@ -356,8 +356,8 @@ bool UIConsole::keyDown(int nKey,
       break;
     }
 
-    case SDLK_w: {
-      if (mod & KMOD_CTRL)
+    case SDLK_W: {
+      if (mod & SDL_KMOD_CTRL)
         m_textEdit.deleteWordLeft();
 
       break;

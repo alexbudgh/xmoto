@@ -58,7 +58,7 @@ void StateServerConsole::xmKey(InputEventType i_type, const XMKey &i_xmkey) {
   SDL_Keymod v_mod;
   std::string v_utf8Char;
 
-  if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_ESCAPE, KMOD_NONE)) {
+  if (i_type == INPUT_DOWN && i_xmkey == XMKey(SDLK_ESCAPE, SDL_KMOD_NONE)) {
     m_requestForEnd = true;
     return;
   }

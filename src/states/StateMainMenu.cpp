@@ -766,8 +766,8 @@ void StateMainMenu::xmKey(InputEventType i_type, const XMKey &i_xmkey) {
   }
 
   else if (i_type == INPUT_DOWN &&
-           (i_xmkey == XMKey(SDLK_ESCAPE, KMOD_NONE) ||
-            i_xmkey.getJoyButton() == SDL_CONTROLLER_BUTTON_B)) {
+           (i_xmkey == XMKey(SDLK_ESCAPE, SDL_KMOD_NONE) ||
+            i_xmkey.getJoyButton() == SDL_GAMEPAD_BUTTON_EAST)) {
     UIWindow *v_windowLevels =
       reinterpret_cast<UIWindow *>(m_GUI->getChild("MAIN:FRAME_LEVELS"));
     UIWindow *v_windowReplays =
@@ -800,7 +800,7 @@ void StateMainMenu::xmKey(InputEventType i_type, const XMKey &i_xmkey) {
 
   /* the "Back" button is the one on the left side of the guide button */
   else if (i_type == INPUT_DOWN &&
-           i_xmkey.getJoyButton() == SDL_CONTROLLER_BUTTON_BACK) {
+           i_xmkey.getJoyButton() == SDL_GAMEPAD_BUTTON_BACK) {
     UIFrame *v_stats =
       reinterpret_cast<UIFrame *>(m_GUI->getChild("MAIN:STATS"));
     v_stats->toggle();
