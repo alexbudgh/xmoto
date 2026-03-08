@@ -939,6 +939,7 @@ public:
     m_nSelected = 0;
     m_bChanged = false;
     m_hideDisabledTabs = false;
+    m_bChildrenRepositioned = false;
   }
 
   /* Methods */
@@ -973,6 +974,7 @@ public:
 private:
   /* Data */
   bool m_bChanged;
+  bool m_bChildrenRepositioned;
   unsigned int m_nSelected;
   std::vector<std::string> m_TabContextHelp;
   bool m_hideDisabledTabs;

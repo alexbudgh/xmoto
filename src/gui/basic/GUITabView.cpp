@@ -30,7 +30,23 @@ Painting
 ===========================================================================*/
 void UITabView::paint(void) {
   /* Header height */
-  int nHeaderHeight = 24;
+  float ds = m_drawLib->getDisplayScale();
+  int nHeaderHeight = (int)(24 * ds);
+  int tabPadY = (int)(6 * ds);
+  int tabSpacing = (int)(18 * ds);
+
+  /* Adjust child Y positions for scaled header (one-time fixup) */
+  if (!m_bChildrenRepositioned) {
+    int headerDelta = nHeaderHeight - 24;
+    if (headerDelta > 0) {
+      for (unsigned int i = 0; i < getChildren().size(); i++) {
+        UIRect &pos = getChildren()[i]->getPosition();
+        pos.nY += headerDelta;
+        pos.nHeight -= headerDelta;
+      }
+    }
+    m_bChildrenRepositioned = true;
+  }
 
   if (isUglyMode()) {
     putRect(0, 0, 2, getPosition().nHeight, MAKE_COLOR(188, 186, 67, 255));
@@ -77,7 +93,7 @@ void UITabView::paint(void) {
 
   /* Render tabs */
   int nCX = 8;
-  int nCY = 6;
+  int nCY = tabPadY;
   int v_width, v_height;
 
   FontManager *v_fm = m_drawLib->getFontSmall();
@@ -115,24 +131,24 @@ void UITabView::paint(void) {
       if (i == m_nSelected) {
         if (isUglyMode() == false) {
           putElem(2, nHeaderHeight, nCX - 8, 8, UI_ELEM_FRAME_TM, false);
-          putElem(nCX + v_width + 6,
+          putElem(nCX + v_width + 8 - 2,
                   nHeaderHeight,
-                  getPosition().nWidth - nCX - v_width - 6 - 2,
+                  getPosition().nWidth - nCX - v_width - 8,
                   8,
                   UI_ELEM_FRAME_TM,
                   false);
         } else {
           putRect(2, nHeaderHeight, nCX - 8, 2, MAKE_COLOR(188, 186, 67, 255));
-          putRect(nCX + v_width + 6,
+          putRect(nCX + v_width + 8 - 2,
                   nHeaderHeight,
-                  getPosition().nWidth - nCX - v_width - 6 - 2,
+                  getPosition().nWidth - nCX - v_width - 8,
                   2,
                   MAKE_COLOR(188, 186, 67, 255));
         }
       }
 
       if (i != m_nSelected && isUglyMode() == false) {
-        putRect(nCX - 6,
+        putRect(nCX - 8 + 2,
                 2,
                 v_width + 16 - 4,
                 nHeaderHeight - 2,
@@ -140,7 +156,7 @@ void UITabView::paint(void) {
       }
       putTextS(nCX, nCY, getChildren()[i]->getCaption(), v_width, v_height);
 
-      nCX += v_width + 18;
+      nCX += v_width + tabSpacing;
     }
   }
   m_bChanged = false;
@@ -186,7 +202,10 @@ Mouse event handling
 void UITabView::mouseLDown(int x, int y) {
   /* Nice. Find out what tab was clicked (if any) */
   /* Header height */
-  int nHeaderHeight = 24;
+  float ds = m_drawLib->getDisplayScale();
+  int nHeaderHeight = (int)(24 * ds);
+
+  int tabSpacing = (int)(18 * ds);
   int nCX = 8;
   FontManager *v_fm = m_drawLib->getFontSmall();
   FontGlyph *v_fg;
@@ -205,7 +224,7 @@ void UITabView::mouseLDown(int x, int y) {
           break;
         }
       }
-      nCX += v_width + 18;
+      nCX += v_width + tabSpacing;
     }
   }
 }
@@ -219,7 +238,10 @@ void UITabView::setTabContextHelp(unsigned int nTab, const std::string &s) {
 
 std::string UITabView::subContextHelp(int x, int y) {
   /* Oh... cursor inside a tab-button? */
-  int nHeaderHeight = 24;
+  float ds = m_drawLib->getDisplayScale();
+  int nHeaderHeight = (int)(24 * ds);
+
+  int tabSpacing = (int)(18 * ds);
   int nCX = 8;
   FontManager *v_fm = m_drawLib->getFontSmall();
   FontGlyph *v_fg;
@@ -232,7 +254,7 @@ std::string UITabView::subContextHelp(int x, int y) {
       v_width = v_fg->realWidth();
 
       if (getChildren()[i]->isDisabled() == false) {
-        if (x >= nCX - 8 && y >= -4 && x < nCX + 16 + v_width &&
+        if (x >= nCX - 8 && y >= -4 && x < nCX + 2 * 8 + v_width &&
             y < nHeaderHeight) {
           /* This one! */
           if (i < m_TabContextHelp.size())
@@ -240,7 +262,7 @@ std::string UITabView::subContextHelp(int x, int y) {
           return "";
         }
       }
-      nCX += v_width + 18;
+      nCX += v_width + tabSpacing;
     }
   }
 
