@@ -771,7 +771,10 @@ void GeomsManager::register_end(Scene *i_scene) {
 }
 
 void GeomsManager::unregister(Scene *i_scene) {
-  getLevelGeom(i_scene)->unregister_scene(i_scene);
+  LevelGeoms *v_levelGeoms = getLevelGeom(i_scene);
+  if (v_levelGeoms != NULL) {
+    v_levelGeoms->unregister_scene(i_scene);
+  }
 }
 
 unsigned int GeomsManager::getNumberOfBlockGeoms() const {
