@@ -1243,7 +1243,7 @@ void UIRoot::paint(void) {
 
   /* Context help? */
   if (m_bShowContextMenu && isDisabled() == false) {
-    int nContextHelpHeight = 20;
+    int nContextHelpHeight = (int)(20 * m_drawLib->getDisplayScale());
 
     /* Shade out bottom of screen */
     m_drawLib->setBlendMode(BLEND_MODE_A);

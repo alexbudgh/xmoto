@@ -163,13 +163,14 @@ UIList::UIList(UIWindow *pParent,
   m_lastRefreshTime = getApp()->getXMTime();
 
   /* draw */
-  m_headerHeight = 18;
-  m_headerSubBorderHeight = 4;
-  m_rowHeight = 16;
-  m_lineMargeX = 6;
-  m_lineMargeY = 6;
-  m_scrollBarArrowWidth = 20;
-  m_scrollBarArrowHeight = 20;
+  float ds = getApp()->getDrawLib()->getDisplayScale();
+  m_headerHeight = (int)(18 * ds);
+  m_headerSubBorderHeight = (int)(4 * ds);
+  m_rowHeight = (int)(16 * ds);
+  m_lineMargeX = (int)(6 * ds);
+  m_lineMargeY = (int)(6 * ds);
+  m_scrollBarArrowWidth = (int)(20 * ds);
+  m_scrollBarArrowHeight = (int)(20 * ds);
   /* **** */
 
   m_filteredItems = 0;
@@ -388,7 +389,7 @@ void UIList::paint(void) {
   }
 
   /* Draw column headers */
-  int nHX = 6, nHY = 6;
+  int nHX = m_lineMargeX, nHY = m_lineMargeY;
 
   if (isDisabled())
     setTextSolidColor(MAKE_COLOR(170, 170, 170, 128));
@@ -407,9 +408,9 @@ void UIList::paint(void) {
       }
     }
   }
-  putRect(6,
-          m_headerHeight + 6,
-          getPosition().nWidth - 12,
+  putRect(m_lineMargeX,
+          m_headerHeight + m_lineMargeY,
+          getPosition().nWidth - 2 * m_lineMargeX,
           2,
           MAKE_COLOR(188, 186, 67, 255));
 
@@ -424,32 +425,32 @@ void UIList::paint(void) {
     } else {
       if (m_bScrollUpPressed && m_bScrollUpHover) {
         putElem(m_lineMargeX + LinesWidth(),
-                6,
-                20,
-                20,
+                m_lineMargeY,
+                m_scrollBarArrowWidth,
+                m_scrollBarArrowHeight,
                 UI_ELEM_SCROLLBUTTON_UP_DOWN,
                 false);
       } else {
         putElem(m_lineMargeX + LinesWidth(),
-                6,
-                20,
-                20,
+                m_lineMargeY,
+                m_scrollBarArrowWidth,
+                m_scrollBarArrowHeight,
                 UI_ELEM_SCROLLBUTTON_UP_UP,
                 false);
       }
 
       if (m_bScrollDownPressed && m_bScrollDownHover) {
         putElem(m_lineMargeX + LinesWidth(),
-                LinesStartY() + LinesHeight() - 20,
-                20,
-                20,
+                LinesStartY() + LinesHeight() - m_scrollBarArrowHeight,
+                m_scrollBarArrowWidth,
+                m_scrollBarArrowHeight,
                 UI_ELEM_SCROLLBUTTON_DOWN_DOWN,
                 false);
       } else {
         putElem(m_lineMargeX + LinesWidth(),
-                LinesStartY() + LinesHeight() - 20,
-                20,
-                20,
+                LinesStartY() + LinesHeight() - m_scrollBarArrowHeight,
+                m_scrollBarArrowWidth,
+                m_scrollBarArrowHeight,
                 UI_ELEM_SCROLLBUTTON_DOWN_UP,
                 false);
       }
@@ -639,29 +640,29 @@ Mouse event handling
 ===========================================================================*/
 void UIList::mouseWheelDown(int x, int y) {
   /* Scroll down! */
-  _Scroll(-16 * GUILIST_SCROLL_SIZE);
+  _Scroll(-m_rowHeight * GUILIST_SCROLL_SIZE);
 }
 
 void UIList::mouseWheelUp(int x, int y) {
   /* Scroll up! */
-  _Scroll(16 * GUILIST_SCROLL_SIZE);
+  _Scroll(m_rowHeight * GUILIST_SCROLL_SIZE);
 }
 
 void UIList::mouseLDoubleClick(int x, int y) {
   /* is it inside the scroll bar ? */
   if (x >= m_lineMargeX + LinesWidth() + 2 &&
-      x <= m_lineMargeX + LinesWidth() + 2 + 16 && y >= 6 + 20 &&
-      y <= LinesStartY() + LinesHeight() - 20) {
+      x <= m_lineMargeX + LinesWidth() + 2 + m_scrollBarArrowWidth && y >= m_lineMargeY + m_scrollBarArrowHeight &&
+      y <= LinesStartY() + LinesHeight() - m_scrollBarArrowHeight) {
     _mouseDownManageScrollBar(x, y);
   }
   /* Is it down inside one of the scroll buttons? */
   else if (x >= m_lineMargeX + LinesWidth() &&
-           x < m_lineMargeX + LinesWidth() + 20 && y >= 6 && y < 6 + 20) {
+           x < m_lineMargeX + LinesWidth() + m_scrollBarArrowWidth && y >= m_lineMargeY && y < m_lineMargeY + m_scrollBarArrowHeight) {
     /* Scroll up! */
     m_bScrollUpPressed = true;
   } else if (x >= m_lineMargeX + LinesWidth() &&
-             x < m_lineMargeX + LinesWidth() + 20 &&
-             y >= LinesStartY() + LinesHeight() - 20 &&
+             x < m_lineMargeX + LinesWidth() + m_scrollBarArrowWidth &&
+             y >= LinesStartY() + LinesHeight() - m_scrollBarArrowHeight &&
              y < LinesStartY() + LinesHeight()) {
     /* Scroll down! */
     m_bScrollDownPressed = true;
@@ -669,7 +670,7 @@ void UIList::mouseLDoubleClick(int x, int y) {
     /* Find out what item is affected */
     for (int i = 0; i < (int)(m_Entries.size() - m_filteredItems); i++) {
       int yy = m_nScroll + LinesStartY() + i * m_rowHeight;
-      if (x >= m_lineMargeX && x < getPosition().nWidth - 6 && y >= yy &&
+      if (x >= m_lineMargeX && x < getPosition().nWidth - m_lineMargeX && y >= yy &&
           y < yy + m_rowHeight) {
         /* Select this */
         setVisibleSelected(i);
@@ -698,29 +699,27 @@ void UIList::mouseLDoubleClick(int x, int y) {
 void UIList::mouseLDown(int x, int y) {
   /* is it inside the scroll bar ? */
   if (x >= m_lineMargeX + LinesWidth() + 2 &&
-      x <= m_lineMargeX + LinesWidth() + 2 + 16 && y >= 6 + 20 &&
-      y <= LinesStartY() + LinesHeight() - 20) {
+      x <= m_lineMargeX + LinesWidth() + 2 + m_scrollBarArrowWidth && y >= m_lineMargeY + m_scrollBarArrowHeight &&
+      y <= LinesStartY() + LinesHeight() - m_scrollBarArrowHeight) {
     _mouseDownManageScrollBar(x, y);
     m_bScrolling = true;
   }
   /* Is it down inside one of the scroll buttons? */
   else if (x >= m_lineMargeX + LinesWidth() &&
-           x < m_lineMargeX + LinesWidth() + 20 && y >= 6 && y < 6 + 20) {
+           x < m_lineMargeX + LinesWidth() + m_scrollBarArrowWidth && y >= m_lineMargeY && y < m_lineMargeY + m_scrollBarArrowHeight) {
     /* Scroll up! */
-    //_Scroll(16);
     m_bScrollUpPressed = true;
   } else if (x >= m_lineMargeX + LinesWidth() &&
-             x < m_lineMargeX + LinesWidth() + 20 &&
-             y >= LinesStartY() + LinesHeight() - 20 &&
+             x < m_lineMargeX + LinesWidth() + m_scrollBarArrowWidth &&
+             y >= LinesStartY() + LinesHeight() - m_scrollBarArrowHeight &&
              y < LinesStartY() + LinesHeight()) {
     /* Scroll down! */
-    // _Scroll(-16);
     m_bScrollDownPressed = true;
   } else {
     /* Find out what item is affected */
     for (int i = 0; i < (int)(m_Entries.size() - m_filteredItems); i++) {
       int yy = m_nScroll + LinesStartY() + i * m_rowHeight;
-      if (x >= m_lineMargeX && x < getPosition().nWidth - 6 && y >= yy &&
+      if (x >= m_lineMargeX && x < getPosition().nWidth - m_lineMargeX && y >= yy &&
           y < yy + m_rowHeight) {
         /* Select this */
         setVisibleSelected(i);
@@ -733,15 +732,13 @@ void UIList::mouseLDown(int x, int y) {
 void UIList::mouseLUp(int x, int y) {
   /* Is it down inside one of the scroll buttons? */
   if (x >= m_lineMargeX + LinesWidth() &&
-      x < m_lineMargeX + LinesWidth() + 20 && y >= 6 && y < 26) {
+      x < m_lineMargeX + LinesWidth() + m_scrollBarArrowWidth && y >= m_lineMargeY && y < m_lineMargeY + m_scrollBarArrowHeight) {
     /* Scroll up! */
-    //_Scroll(16);
   } else if (x >= m_lineMargeX + LinesWidth() &&
-             x < m_lineMargeX + LinesWidth() + 20 &&
-             y >= LinesStartY() + LinesHeight() - 20 &&
+             x < m_lineMargeX + LinesWidth() + m_scrollBarArrowWidth &&
+             y >= LinesStartY() + LinesHeight() - m_scrollBarArrowHeight &&
              y < LinesStartY() + LinesHeight()) {
     /* Scroll down! */
-    //_Scroll(-16);
   }
 
   m_bClicked = true;
@@ -759,14 +756,14 @@ void UIList::mouseHover(int x, int y) {
   }
   /* Is it down inside one of the scroll buttons? */
   else if (x >= m_lineMargeX + LinesWidth() &&
-           x < m_lineMargeX + LinesWidth() + 20 && y >= 6 && y < 6 + 20) {
+           x < m_lineMargeX + LinesWidth() + m_scrollBarArrowWidth && y >= m_lineMargeY && y < m_lineMargeY + m_scrollBarArrowHeight) {
     /* Scroll up! */
     m_bScrollUpHover = true;
   }
 
   if (x >= m_lineMargeX + LinesWidth() &&
-      x < m_lineMargeX + LinesWidth() + 20 &&
-      y >= LinesStartY() + LinesHeight() - 20 &&
+      x < m_lineMargeX + LinesWidth() + m_scrollBarArrowWidth &&
+      y >= LinesStartY() + LinesHeight() - m_scrollBarArrowHeight &&
       y < LinesStartY() + LinesHeight()) {
     /* Scroll down! */
     m_bScrollDownHover = true;
