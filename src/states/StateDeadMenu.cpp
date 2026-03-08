@@ -68,7 +68,7 @@ void StateDeadMenu::enter() {
     }
   }
 
-  createGUIIfNeeded(&m_screen);
+  createGUIIfNeeded(&m_virtualScreen);
   m_GUI = m_sGUI;
 
   UIButton *playNextButton = reinterpret_cast<UIButton *>(

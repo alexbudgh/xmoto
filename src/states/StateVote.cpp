@@ -39,7 +39,7 @@ StateVote::~StateVote() {}
 void StateVote::enter() {
   UIButton *pButtonQ0, *pButtonD0;
 
-  createGUIIfNeeded(&m_screen);
+  createGUIIfNeeded(&m_virtualScreen);
   m_GUI = m_sGUI;
 
   pButtonD0 = reinterpret_cast<UIButton *>(m_GUI->getChild("FRAME:D_0"));

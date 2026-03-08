@@ -82,6 +82,10 @@ GameState::~GameState() {
 
 void GameState::setScreen(const RenderSurface &i_screen) {
   m_screen = i_screen;
+  float ds = GameApp::instance()->getDrawLib()->getDisplayScale();
+  m_virtualScreen = RenderSurface(
+    Vector2i((int)(m_screen.downleft().x / ds), (int)(m_screen.downleft().y / ds)),
+    Vector2i((int)(m_screen.upright().x / ds), (int)(m_screen.upright().y / ds)));
 }
 
 RenderSurface *GameState::getScreen() {

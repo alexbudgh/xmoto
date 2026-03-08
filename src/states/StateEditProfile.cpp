@@ -45,7 +45,7 @@ StateEditProfile::~StateEditProfile() {}
 void StateEditProfile::enter() {
   GameApp::instance()->playMenuMusic("menu1");
 
-  createGUIIfNeeded(&m_screen);
+  createGUIIfNeeded(&m_virtualScreen);
   m_GUI = m_sGUI;
 
   updateOptions();

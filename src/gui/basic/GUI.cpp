@@ -1243,7 +1243,7 @@ void UIRoot::paint(void) {
 
   /* Context help? */
   if (m_bShowContextMenu && isDisabled() == false) {
-    int nContextHelpHeight = (int)(20 * m_drawLib->getDisplayScale());
+    int nContextHelpHeight = 20;
 
     /* Shade out bottom of screen */
     m_drawLib->setBlendMode(BLEND_MODE_A);
@@ -1273,42 +1273,50 @@ void UIRoot::paint(void) {
 }
 
 void UIRoot::mouseLDown(int x, int y) {
-  UIRootMouseEvent evt = { UI_ROOT_MOUSE_LBUTTON_DOWN, x, y };
+  float ds = m_drawLib->getDisplayScale();
+  UIRootMouseEvent evt = { UI_ROOT_MOUSE_LBUTTON_DOWN, (int)(x / ds), (int)(y / ds) };
   _RootMouseEvent(this, evt);
 }
 
 void UIRoot::mouseLDoubleClick(int x, int y) {
-  UIRootMouseEvent evt = { UI_ROOT_MOUSE_DOUBLE_CLICK, x, y };
+  float ds = m_drawLib->getDisplayScale();
+  UIRootMouseEvent evt = { UI_ROOT_MOUSE_DOUBLE_CLICK, (int)(x / ds), (int)(y / ds) };
   _RootMouseEvent(this, evt);
 }
 
 void UIRoot::mouseLUp(int x, int y) {
-  UIRootMouseEvent evt = { UI_ROOT_MOUSE_LBUTTON_UP, x, y };
+  float ds = m_drawLib->getDisplayScale();
+  UIRootMouseEvent evt = { UI_ROOT_MOUSE_LBUTTON_UP, (int)(x / ds), (int)(y / ds) };
   _RootMouseEvent(this, evt);
 }
 
 void UIRoot::mouseRDown(int x, int y) {
-  UIRootMouseEvent evt = { UI_ROOT_MOUSE_RBUTTON_DOWN, x, y };
+  float ds = m_drawLib->getDisplayScale();
+  UIRootMouseEvent evt = { UI_ROOT_MOUSE_RBUTTON_DOWN, (int)(x / ds), (int)(y / ds) };
   _RootMouseEvent(this, evt);
 }
 
 void UIRoot::mouseRUp(int x, int y) {
-  UIRootMouseEvent evt = { UI_ROOT_MOUSE_RBUTTON_UP, x, y };
+  float ds = m_drawLib->getDisplayScale();
+  UIRootMouseEvent evt = { UI_ROOT_MOUSE_RBUTTON_UP, (int)(x / ds), (int)(y / ds) };
   _RootMouseEvent(this, evt);
 }
 
 void UIRoot::mouseHover(int x, int y) {
-  UIRootMouseEvent evt = { UI_ROOT_MOUSE_HOVER, x, y };
+  float ds = m_drawLib->getDisplayScale();
+  UIRootMouseEvent evt = { UI_ROOT_MOUSE_HOVER, (int)(x / ds), (int)(y / ds) };
   _RootMouseEvent(this, evt);
 }
 
 void UIRoot::mouseWheelUp(int x, int y, int16_t wheelX, int16_t wheelY) {
-  UIRootMouseEvent evt = { UI_ROOT_MOUSE_WHEEL_UP, x, y };
+  float ds = m_drawLib->getDisplayScale();
+  UIRootMouseEvent evt = { UI_ROOT_MOUSE_WHEEL_UP, (int)(x / ds), (int)(y / ds) };
   _RootMouseEvent(this, evt);
 }
 
 void UIRoot::mouseWheelDown(int x, int y, int16_t wheelX, int16_t wheelY) {
-  UIRootMouseEvent evt = { UI_ROOT_MOUSE_WHEEL_DOWN, x, y };
+  float ds = m_drawLib->getDisplayScale();
+  UIRootMouseEvent evt = { UI_ROOT_MOUSE_WHEEL_DOWN, (int)(x / ds), (int)(y / ds) };
   _RootMouseEvent(this, evt);
 }
 

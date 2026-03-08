@@ -199,6 +199,7 @@ DrawLibOpenGL::~DrawLibOpenGL() {
 DrawLibOpenGL::DrawLibOpenGL()
   : DrawLib() {
   m_glContext = NULL;
+  m_savedRenderSurf = NULL;
 };
 
 /*===========================================================================
@@ -217,8 +218,17 @@ void DrawLibOpenGL::glTexCoord(float x, float y) {
 }
 
 void DrawLibOpenGL::setClipRect(int x, int y, unsigned int w, unsigned int h) {
-  // glScissor(x, m_nDispHeight - (y+h), w, h);
-  glScissor(x, m_renderSurf->upright().y - (y + h), w, h);
+  /* When UI scaling is active, coordinates are virtual and must be converted
+     to real pixels for glScissor. The upright Y comes from the real surface. */
+  if (m_savedRenderSurf != NULL) {
+    int realX = (int)(x * m_displayScale);
+    int realY = (int)(m_savedRenderSurf->upright().y - (int)((y + h) * m_displayScale));
+    unsigned int realW = (unsigned int)(w * m_displayScale);
+    unsigned int realH = (unsigned int)(h * m_displayScale);
+    glScissor(realX, realY, realW, realH);
+  } else {
+    glScissor(x, m_renderSurf->upright().y - (y + h), w, h);
+  }
 
   m_nLScissorX = x;
   m_nLScissorY = y;
@@ -410,23 +420,19 @@ void DrawLibOpenGL::init(unsigned int nDispWidth,
   glClear(GL_COLOR_BUFFER_BIT);
   SDL_GL_SwapWindow(m_window);
 
-  /* Load fonts scaled by display DPI factor */
+  /* Query display scale factor for UI coordinate scaling */
   m_displayScale = SDL_GetWindowDisplayScale(m_window);
   if (m_displayScale < 1.0f) m_displayScale = 1.0f;
 
+  /* Load fonts at original sizes — the UI projection matrix handles scaling */
   m_fontSmall = getFontManager(
-    XMFS::FullPath(FDT_DATA, FontManager::getDrawFontFile()),
-    (unsigned int)(14 * m_displayScale));
+    XMFS::FullPath(FDT_DATA, FontManager::getDrawFontFile()), 14);
   m_fontMedium = getFontManager(
-    XMFS::FullPath(FDT_DATA, FontManager::getDrawFontFile()),
-    (unsigned int)(22 * m_displayScale));
+    XMFS::FullPath(FDT_DATA, FontManager::getDrawFontFile()), 22);
   m_fontBig = getFontManager(
-    XMFS::FullPath(FDT_DATA, FontManager::getDrawFontFile()),
-    (unsigned int)(60 * m_displayScale));
+    XMFS::FullPath(FDT_DATA, FontManager::getDrawFontFile()), 60);
   m_fontMonospace = getFontManager(
-    XMFS::FullPath(FDT_DATA, FontManager::getMonospaceFontFile()),
-    (unsigned int)(12 * m_displayScale),
-    (unsigned int)(7 * m_displayScale));
+    XMFS::FullPath(FDT_DATA, FontManager::getMonospaceFontFile()), 12, 7);
 }
 
 void DrawLibOpenGL::unInit() {
@@ -588,6 +594,43 @@ void DrawLibOpenGL::setCameraDimensionality(CameraDimension dimension) {
   if (dimension == CAMERA_2D) {
     glOrtho(0, m_renderSurf->size().x, 0, m_renderSurf->size().y, -1, 1);
   }
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+}
+
+void DrawLibOpenGL::setUIScale() {
+  if (m_displayScale <= 1.0f) return;
+
+  /* Replace the ortho projection with virtual coordinates.
+     The viewport stays at real pixel dimensions, so the GL pipeline
+     scales virtual coords to real pixels automatically.
+     Also swap the render surface so glVertexSP uses virtual height
+     for the Y-flip. */
+  int virtW = (int)(m_renderSurf->size().x / m_displayScale);
+  int virtH = (int)(m_renderSurf->size().y / m_displayScale);
+
+  m_savedRenderSurf = m_renderSurf;
+  m_virtualRenderSurf.update(Vector2i(0, 0), Vector2i(virtW, virtH));
+  m_renderSurf = &m_virtualRenderSurf;
+
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  glOrtho(0, virtW, 0, virtH, -1, 1);
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+}
+
+void DrawLibOpenGL::unsetUIScale() {
+  if (m_displayScale <= 1.0f) return;
+
+  /* Restore real pixel render surface and projection */
+  m_renderSurf = m_savedRenderSurf;
+  m_savedRenderSurf = NULL;
+
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  glOrtho(0, m_renderSurf->size().x,
+          0, m_renderSurf->size().y, -1, 1);
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
 }

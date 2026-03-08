@@ -151,6 +151,8 @@ public:
   SDL_Window *getWindow() const { return m_window; }
 
   virtual void setCameraDimensionality(CameraDimension dimension);
+  virtual void setUIScale();
+  virtual void unsetUIScale();
 
   void setRenderSurface(RenderSurface *renderSurf, bool i_own);
   RenderSurface *getRenderSurface();

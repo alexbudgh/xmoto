@@ -399,6 +399,9 @@ void DrawLib::drawCircle(const Vector2f &Center,
 
 void DrawLib::setCameraDimensionality(CameraDimension dimension) {}
 
+void DrawLib::setUIScale() {}
+void DrawLib::unsetUIScale() {}
+
 void DrawLib::setRenderSurface(RenderSurface *renderSurf, bool i_own) {
   if (m_renderSurf != renderSurf && m_ownsRenderSurface)
     delete m_renderSurf;

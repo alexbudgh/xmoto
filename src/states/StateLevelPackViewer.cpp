@@ -54,7 +54,7 @@ StateLevelPackViewer::~StateLevelPackViewer() {
 }
 
 void StateLevelPackViewer::enter() {
-  createGUIIfNeeded(&m_screen);
+  createGUIIfNeeded(&m_virtualScreen);
   m_GUI = m_sGUI;
 
   updateGUI();

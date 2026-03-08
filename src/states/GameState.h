@@ -119,6 +119,7 @@ protected:
   float m_updateCounter;
 
   RenderSurface m_screen;
+  RenderSurface m_virtualScreen; // m_screen scaled down by displayScale for UI
 
   std::string m_name;
   std::string m_type; // some state can have the same type (exemple, all the

@@ -93,7 +93,7 @@ StateManager::StateManager() {
 
   m_currentUniqueId = 0;
 
-  // the full xmoto windows it the screen of the statemanager
+  // the full xmoto window is the screen of the statemanager
   m_screen =
     RenderSurface(Vector2i(0, 0),
                   Vector2i(GameApp::instance()->getDrawLib()->getDispWidth(),

@@ -168,7 +168,7 @@ StateMainMenu::~StateMainMenu() {
 }
 
 void StateMainMenu::enter() {
-  createGUIIfNeeded(&m_screen);
+  createGUIIfNeeded(&m_virtualScreen);
   m_GUI = m_sGUI;
 
   StateMenu::enter();

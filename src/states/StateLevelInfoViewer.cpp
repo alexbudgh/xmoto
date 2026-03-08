@@ -55,7 +55,7 @@ StateLevelInfoViewer::~StateLevelInfoViewer() {
 }
 
 void StateLevelInfoViewer::enter() {
-  createGUIIfNeeded(&m_screen);
+  createGUIIfNeeded(&m_virtualScreen);
   m_GUI = m_sGUI;
   updateGUI();
 

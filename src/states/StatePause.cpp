@@ -67,7 +67,7 @@ void StatePause::enter() {
 
   Sound::togglePauseMusic();
 
-  createGUIIfNeeded(&m_screen);
+  createGUIIfNeeded(&m_virtualScreen);
   m_GUI = m_sGUI;
 
   /* reset the playnext button */

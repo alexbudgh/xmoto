@@ -163,14 +163,13 @@ UIList::UIList(UIWindow *pParent,
   m_lastRefreshTime = getApp()->getXMTime();
 
   /* draw */
-  float ds = getApp()->getDrawLib()->getDisplayScale();
-  m_headerHeight = (int)(18 * ds);
-  m_headerSubBorderHeight = (int)(4 * ds);
-  m_rowHeight = (int)(16 * ds);
-  m_lineMargeX = (int)(6 * ds);
-  m_lineMargeY = (int)(6 * ds);
-  m_scrollBarArrowWidth = (int)(20 * ds);
-  m_scrollBarArrowHeight = (int)(20 * ds);
+  m_headerHeight = 18;
+  m_headerSubBorderHeight = 4;
+  m_rowHeight = 16;
+  m_lineMargeX = 6;
+  m_lineMargeY = 6;
+  m_scrollBarArrowWidth = 20;
+  m_scrollBarArrowHeight = 20;
   /* **** */
 
   m_filteredItems = 0;

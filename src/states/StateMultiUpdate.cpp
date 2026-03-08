@@ -46,7 +46,7 @@ void StateMultiUpdate::init() {
 StateMultiUpdate::~StateMultiUpdate() {}
 
 void StateMultiUpdate::enter() {
-  createGUIIfNeeded(&m_screen);
+  createGUIIfNeeded(&m_virtualScreen);
   m_GUI = m_sGUI;
 
   StateMenu::enter();

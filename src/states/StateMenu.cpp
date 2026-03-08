@@ -74,7 +74,9 @@ bool StateMenu::render() {
   GameState::render();
   DrawLib *pDrawlib = GameApp::instance()->getDrawLib();
   pDrawlib->getMenuCamera()->setCamera2d();
+  pDrawlib->setUIScale();
   m_GUI->paint();
+  pDrawlib->unsetUIScale();
   return true;
 }
 

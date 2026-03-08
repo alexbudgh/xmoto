@@ -30,23 +30,9 @@ Painting
 ===========================================================================*/
 void UITabView::paint(void) {
   /* Header height */
-  float ds = m_drawLib->getDisplayScale();
-  int nHeaderHeight = (int)(24 * ds);
-  int tabPadY = (int)(6 * ds);
-  int tabSpacing = (int)(18 * ds);
-
-  /* Adjust child Y positions for scaled header (one-time fixup) */
-  if (!m_bChildrenRepositioned) {
-    int headerDelta = nHeaderHeight - 24;
-    if (headerDelta > 0) {
-      for (unsigned int i = 0; i < getChildren().size(); i++) {
-        UIRect &pos = getChildren()[i]->getPosition();
-        pos.nY += headerDelta;
-        pos.nHeight -= headerDelta;
-      }
-    }
-    m_bChildrenRepositioned = true;
-  }
+  int nHeaderHeight = 24;
+  int tabPadY = 6;
+  int tabSpacing = 18;
 
   if (isUglyMode()) {
     putRect(0, 0, 2, getPosition().nHeight, MAKE_COLOR(188, 186, 67, 255));
@@ -202,10 +188,8 @@ Mouse event handling
 void UITabView::mouseLDown(int x, int y) {
   /* Nice. Find out what tab was clicked (if any) */
   /* Header height */
-  float ds = m_drawLib->getDisplayScale();
-  int nHeaderHeight = (int)(24 * ds);
-
-  int tabSpacing = (int)(18 * ds);
+  int nHeaderHeight = 24;
+  int tabSpacing = 18;
   int nCX = 8;
   FontManager *v_fm = m_drawLib->getFontSmall();
   FontGlyph *v_fg;
@@ -238,10 +222,8 @@ void UITabView::setTabContextHelp(unsigned int nTab, const std::string &s) {
 
 std::string UITabView::subContextHelp(int x, int y) {
   /* Oh... cursor inside a tab-button? */
-  float ds = m_drawLib->getDisplayScale();
-  int nHeaderHeight = (int)(24 * ds);
-
-  int tabSpacing = (int)(18 * ds);
+  int nHeaderHeight = 24;
+  int tabSpacing = 18;
   int nCX = 8;
   FontManager *v_fm = m_drawLib->getFontSmall();
   FontGlyph *v_fg;

@@ -38,6 +38,8 @@ public:
   virtual void glVertex(float x, float y);
 
   virtual void setCameraDimensionality(CameraDimension dimension);
+  virtual void setUIScale();
+  virtual void unsetUIScale();
 
   // texture coordinate
   virtual void glTexCoord(float x, float y);
@@ -105,6 +107,8 @@ public:
 
 private:
   SDL_GLContext m_glContext;
+  RenderSurface *m_savedRenderSurf;
+  RenderSurface m_virtualRenderSurf;
 };
 
 #endif

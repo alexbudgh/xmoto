@@ -40,7 +40,7 @@ StateRequestKey::StateRequestKey(const std::string &i_txt,
 StateRequestKey::~StateRequestKey() {}
 
 void StateRequestKey::enter() {
-  createGUIIfNeeded(&m_screen);
+  createGUIIfNeeded(&m_virtualScreen);
   m_GUI = m_sGUI;
   updateGUI();
 

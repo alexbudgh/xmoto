@@ -135,9 +135,9 @@ void StateMessageBox::xmKey(InputEventType i_type, const XMKey &i_xmkey) {
 void StateMessageBox::createGUI() {
   DrawLib *drawlib = GameApp::instance()->getDrawLib();
 
-  m_GUI = new UIRoot(&m_screen);
+  m_GUI = new UIRoot(&m_virtualScreen);
   m_GUI->setFont(drawlib->getFontSmall());
-  m_GUI->setPosition(0, 0, m_screen.getDispWidth(), m_screen.getDispHeight());
+  m_GUI->setPosition(0, 0, m_virtualScreen.getDispWidth(), m_virtualScreen.getDispHeight());
 
   m_msgbox = m_GUI->msgBox(m_text,
                            (UIMsgBoxButton)(m_buttons),
