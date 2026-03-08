@@ -200,7 +200,8 @@ SoundSample *Sound::loadSample(const std::string &File) {
   pSample->Name = File;
 
   /* Setup an IOStream interface */
-  SDL_IOStreamInterface iface = {};
+  SDL_IOStreamInterface iface;
+  SDL_INIT_INTERFACE(&iface);
   iface.size = IOStream_size;
   iface.seek = IOStream_seek;
   iface.read = IOStream_read;
@@ -215,7 +216,7 @@ SoundSample *Sound::loadSample(const std::string &File) {
 
   SDL_IOStream *io = SDL_OpenIO(&iface, (void *)pf);
 
-  pSample->pAudio = MIX_LoadAudio_IO(m_pMixer, io, true, false);
+  pSample->pAudio = MIX_LoadAudio_IO(m_pMixer, io, false, false);
 
   XMFS::closeFile(pf);
   SDL_CloseIO(io);
