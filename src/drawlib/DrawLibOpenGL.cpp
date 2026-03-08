@@ -198,15 +198,6 @@ DrawLibOpenGL::~DrawLibOpenGL() {
 
 DrawLibOpenGL::DrawLibOpenGL()
   : DrawLib() {
-  m_fontSmall = getFontManager(
-    XMFS::FullPath(FDT_DATA, FontManager::getDrawFontFile()), 14);
-  m_fontMedium = getFontManager(
-    XMFS::FullPath(FDT_DATA, FontManager::getDrawFontFile()), 22);
-  m_fontBig = getFontManager(
-    XMFS::FullPath(FDT_DATA, FontManager::getDrawFontFile()), 60);
-  m_fontMonospace = getFontManager(
-    XMFS::FullPath(FDT_DATA, FontManager::getMonospaceFontFile()), 12, 7);
-
   m_glContext = NULL;
 };
 
@@ -418,6 +409,24 @@ void DrawLibOpenGL::init(unsigned int nDispWidth,
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
   glClear(GL_COLOR_BUFFER_BIT);
   SDL_GL_SwapWindow(m_window);
+
+  /* Load fonts scaled by display DPI factor */
+  m_displayScale = SDL_GetWindowDisplayScale(m_window);
+  if (m_displayScale < 1.0f) m_displayScale = 1.0f;
+
+  m_fontSmall = getFontManager(
+    XMFS::FullPath(FDT_DATA, FontManager::getDrawFontFile()),
+    (unsigned int)(14 * m_displayScale));
+  m_fontMedium = getFontManager(
+    XMFS::FullPath(FDT_DATA, FontManager::getDrawFontFile()),
+    (unsigned int)(22 * m_displayScale));
+  m_fontBig = getFontManager(
+    XMFS::FullPath(FDT_DATA, FontManager::getDrawFontFile()),
+    (unsigned int)(60 * m_displayScale));
+  m_fontMonospace = getFontManager(
+    XMFS::FullPath(FDT_DATA, FontManager::getMonospaceFontFile()),
+    (unsigned int)(12 * m_displayScale),
+    (unsigned int)(7 * m_displayScale));
 }
 
 void DrawLibOpenGL::unInit() {

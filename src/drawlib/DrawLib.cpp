@@ -101,6 +101,7 @@ DrawLib::DrawLib() {
   m_renderSurf = NULL;
   m_window = NULL;
   m_menuCamera = NULL;
+  m_displayScale = 1.0f;
 
   m_fontSmall = NULL;
   m_fontMedium = NULL;

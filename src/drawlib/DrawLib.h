@@ -304,6 +304,8 @@ public:
     unsigned int i_fixedFontSize = 0 /* if > 0, force width */);
   static void checkFontPrerequites();
 
+  float getDisplayScale() const { return m_displayScale; }
+
   Camera *getMenuCamera();
 
 protected:
@@ -315,6 +317,7 @@ protected:
   FontManager *m_fontBig;
   FontManager *m_fontMonospace;
 
+  float m_displayScale;
   bool m_bWindowed; /* Windowed or not */
 
   Texture *m_texture;
